@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import remarkGfm from "remark-gfm";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import { BlogPostingJsonLd } from "@/components/BlogPostingJsonLd";
 import { mdxComponents } from "@/components/mdx-components";
@@ -81,7 +82,15 @@ export default async function BlogPostPage({ params }: Props) {
         </div>
 
         <div className="prose prose-lg prose-invert mt-12 max-w-none prose-headings:scroll-mt-24 prose-headings:font-semibold prose-headings:tracking-tight prose-h2:mt-12 prose-h2:text-white prose-h3:mt-8 prose-h3:text-white prose-p:leading-[1.75] prose-a:font-medium prose-a:text-accent prose-a:no-underline hover:prose-a:text-accent/90 hover:prose-a:underline prose-strong:font-semibold prose-strong:text-white prose-li:marker:text-accent/80">
-          <MDXRemote source={post.content} components={mdxComponents} />
+          <MDXRemote
+            source={post.content}
+            components={mdxComponents}
+            options={{
+              mdxOptions: {
+                remarkPlugins: [remarkGfm],
+              },
+            }}
+          />
         </div>
       </article>
     </>

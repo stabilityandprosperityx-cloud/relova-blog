@@ -11,3 +11,12 @@
     @apply min-h-screen bg-surface text-muted antialiased;
   }
 }
+
+/* MDX / GFM tables: scroll hint on small screens, zebra optional contrast */
+.prose .mdx-table-scroll {
+  -webkit-overflow-scrolling: touch;
+}
+
+.prose .mdx-table tbody tr:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.02);
+}
