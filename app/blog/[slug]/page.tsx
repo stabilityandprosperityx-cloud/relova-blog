@@ -64,21 +64,25 @@ export default async function BlogPostPage({ params }: Props) {
   return (
     <>
       <BlogPostingJsonLd post={post} url={pageUrl} />
-      <article className="mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-16">
-        <p className="text-sm font-medium text-terracotta">
-          <Link href="/blog" className="hover:underline">
-            Blog
-          </Link>
-          <span className="mx-2 text-navy/40">/</span>
-          {formatDate(post.date)}
-        </p>
-        <h1 className="mt-3 text-3xl font-bold tracking-tight text-navy sm:text-4xl">
-          {post.title}
-        </h1>
-        <p className="mt-2 text-navy/70">By {post.author}</p>
-        <p className="mt-6 text-lg leading-relaxed text-navy/85">{post.description}</p>
+      <article className="mx-auto max-w-3xl px-4 py-14 sm:px-6 sm:py-20">
+        <div className="rounded-xl border border-white/[0.06] bg-graphite/40 px-5 py-8 sm:px-8 sm:py-10">
+          <p className="text-[13px] font-medium text-terracotta">
+            <Link href="/blog" className="transition-colors hover:text-terracotta/85">
+              Blog
+            </Link>
+            <span className="mx-2 text-cream/25">/</span>
+            <span className="tabular-nums text-cream/50">{formatDate(post.date)}</span>
+          </p>
+          <h1 className="mt-4 text-3xl font-semibold tracking-tight text-cream sm:text-[2.25rem] sm:leading-[1.15]">
+            {post.title}
+          </h1>
+          <p className="mt-3 text-sm text-cream/45">By {post.author}</p>
+          <p className="mt-6 text-lg leading-relaxed text-cream/70">{post.description}</p>
+        </div>
 
-        <div className="prose prose-lg mt-10 max-w-none text-navy/90 prose-headings:scroll-mt-24 prose-headings:font-semibold prose-headings:text-navy prose-p:leading-relaxed prose-a:text-terracotta prose-a:no-underline hover:prose-a:underline prose-strong:text-navy">
+        <div
+          className="prose prose-lg prose-invert mt-12 max-w-none prose-headings:scroll-mt-24 prose-headings:font-semibold prose-headings:tracking-tight prose-h2:mt-12 prose-h2:text-cream prose-h3:mt-8 prose-h3:text-cream prose-p:leading-[1.75] prose-a:font-medium prose-a:text-terracotta prose-a:no-underline hover:prose-a:text-terracotta/90 hover:prose-a:underline prose-strong:font-semibold prose-strong:text-cream prose-li:marker:text-terracotta/80"
+        >
           <MDXRemote source={post.content} components={mdxComponents} />
         </div>
       </article>
