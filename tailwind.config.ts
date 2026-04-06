@@ -10,11 +10,13 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        surface: "#0A0A0F",
+        card: "#12121A",
+        accent: "#38BDF8",
+        muted: "#94A3B8",
         terracotta: "#E07A5F",
         navy: "#2D3561",
         cream: "#F4F1DE",
-        void: "#0F0F0F",
-        graphite: "#111111",
       },
       fontFamily: {
         sans: [
@@ -26,25 +28,25 @@ const config: Config = {
           "sans-serif",
         ],
       },
-      typography: ({ theme }: { theme: (path: string) => string }) => ({
+      typography: () => ({
         invert: {
           css: {
-            "--tw-prose-body": theme("colors.cream / 0.88"),
-            "--tw-prose-headings": theme("colors.cream"),
-            "--tw-prose-lead": theme("colors.cream / 0.75"),
-            "--tw-prose-links": theme("colors.terracotta"),
-            "--tw-prose-bold": theme("colors.cream"),
-            "--tw-prose-counters": theme("colors.terracotta"),
-            "--tw-prose-bullets": theme("colors.terracotta"),
-            "--tw-prose-hr": "rgb(45 53 97 / 0.45)",
-            "--tw-prose-quotes": theme("colors.cream / 0.72"),
-            "--tw-prose-quote-borders": theme("colors.navy"),
-            "--tw-prose-captions": theme("colors.cream / 0.55"),
-            "--tw-prose-code": theme("colors.cream"),
-            "--tw-prose-pre-code": theme("colors.cream / 0.9"),
-            "--tw-prose-pre-bg": theme("colors.graphite"),
-            "--tw-prose-th-borders": "rgb(45 53 97 / 0.4)",
-            "--tw-prose-td-borders": "rgb(255 255 255 / 0.08)",
+            "--tw-prose-body": "#94A3B8",
+            "--tw-prose-headings": "#ffffff",
+            "--tw-prose-lead": "#94A3B8",
+            "--tw-prose-links": "#38BDF8",
+            "--tw-prose-bold": "#ffffff",
+            "--tw-prose-counters": "#38BDF8",
+            "--tw-prose-bullets": "#38BDF8",
+            "--tw-prose-hr": "rgb(56 189 248 / 0.2)",
+            "--tw-prose-quotes": "#94A3B8",
+            "--tw-prose-quote-borders": "rgb(56 189 248 / 0.25)",
+            "--tw-prose-captions": "#94A3B8",
+            "--tw-prose-code": "#ffffff",
+            "--tw-prose-pre-code": "rgb(255 255 255 / 0.9)",
+            "--tw-prose-pre-bg": "#12121A",
+            "--tw-prose-th-borders": "rgb(56 189 248 / 0.15)",
+            "--tw-prose-td-borders": "rgb(255 255 255 / 0.06)",
           },
         },
       }),

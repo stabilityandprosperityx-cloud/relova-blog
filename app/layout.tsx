@@ -32,7 +32,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className="flex min-h-screen flex-col font-sans selection:bg-terracotta/25 selection:text-cream">
+      <body className="flex min-h-screen flex-col font-sans selection:bg-accent/20 selection:text-white">
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />

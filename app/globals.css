@@ -8,6 +8,6 @@
   }
 
   body {
-    @apply min-h-screen bg-void text-cream antialiased;
+    @apply min-h-screen bg-surface text-muted antialiased;
   }
 }

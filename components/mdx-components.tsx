@@ -4,7 +4,7 @@ export const mdxComponents = {
   a: (props: AnchorHTMLAttributes<HTMLAnchorElement>) => (
     <a
       {...props}
-      className="font-medium text-terracotta underline-offset-2 hover:underline"
+      className="font-medium text-accent underline-offset-2 hover:text-accent/90 hover:underline"
     />
   ),
 };
