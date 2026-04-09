@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import remarkGfm from "remark-gfm";
+import rehypeSlug from "rehype-slug";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import { BlogPostingJsonLd } from "@/components/BlogPostingJsonLd";
 import { mdxComponents } from "@/components/mdx-components";
@@ -88,6 +89,7 @@ export default async function BlogPostPage({ params }: Props) {
             options={{
               mdxOptions: {
                 remarkPlugins: [remarkGfm],
+                rehypePlugins: [rehypeSlug],
               },
             }}
           />

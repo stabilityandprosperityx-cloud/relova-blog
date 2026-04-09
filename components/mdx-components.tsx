@@ -1,6 +1,7 @@
 import type {
   AnchorHTMLAttributes,
   HTMLAttributes,
+  ReactNode,
   TableHTMLAttributes,
   TdHTMLAttributes,
   ThHTMLAttributes,
@@ -10,7 +11,23 @@ function cx(...parts: (string | undefined)[]) {
   return parts.filter(Boolean).join(" ");
 }
 
+function JsonLd({ children }: { children?: ReactNode }) {
+  const raw =
+    typeof children === "string"
+      ? children
+      : Array.isArray(children)
+        ? children.map(String).join("")
+        : String(children ?? "");
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: raw.trim() }}
+    />
+  );
+}
+
 export const mdxComponents = {
+  JsonLd,
   a: (props: AnchorHTMLAttributes<HTMLAnchorElement>) => (
     <a
       {...props}
