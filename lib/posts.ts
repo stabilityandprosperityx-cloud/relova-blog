@@ -11,6 +11,7 @@ export type PostFrontmatter = {
   slug: string;
   author: string;
   ogImage: string;
+  category?: string;
 };
 
 export type PostListItem = PostFrontmatter;
@@ -26,7 +27,10 @@ function parseFrontmatter(data: Record<string, unknown>): PostFrontmatter {
       throw new Error(`Missing or invalid frontmatter: ${key}`);
     }
   }
-  return data as unknown as PostFrontmatter;
+  return {
+    ...(data as unknown as PostFrontmatter),
+    ...(typeof data.category === "string" ? { category: data.category } : {}),
+  };
 }
 
 export function getPostSlugs(): string[] {
@@ -61,6 +65,7 @@ export function getAllPosts(): PostListItem[] {
             slug: post.slug,
             author: post.author,
             ogImage: post.ogImage,
+            ...(post.category ? { category: post.category } : {}),
           }
         : null;
     })
