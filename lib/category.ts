@@ -5,14 +5,64 @@ export type Category = {
 };
 
 export const CATEGORIES: Category[] = [
-  { id: "all", label: "All", emoji: "🌐" },
-  { id: "country", label: "Country Guides", emoji: "🌍" },
-  { id: "city", label: "City Guides", emoji: "🏙️" },
-  { id: "visa", label: "Visas & Residency", emoji: "📋" },
-  { id: "tax", label: "Taxes & Finance", emoji: "💰" },
-  { id: "work", label: "Work & Freelance", emoji: "💼" },
-  { id: "living", label: "Housing & Living", emoji: "🏠" },
-  { id: "lifestyle", label: "Lifestyle", emoji: "✈️" },
+  { id: "all",       label: "All",               emoji: "🌐" },
+  { id: "country",   label: "Country Guides",    emoji: "🌍" },
+  { id: "city",      label: "City Guides",        emoji: "🏙️" },
+  { id: "visa",      label: "Visas & Residency",  emoji: "📋" },
+  { id: "tax",       label: "Taxes & Finance",    emoji: "💰" },
+  { id: "work",      label: "Work & Freelance",   emoji: "💼" },
+  { id: "living",    label: "Housing & Living",   emoji: "🏠" },
+  { id: "lifestyle", label: "Lifestyle",           emoji: "✈️" },
+  { id: "retire",    label: "Retirement",          emoji: "🌴" },
+];
+
+// City-level slugs: specific cities/neighborhoods/comparisons within a country
+const CITY_SLUGS = [
+  // Neighborhood guides
+  "neighborhood", "quartier",
+  // City vs city comparisons
+  "lisbon-vs-porto", "lisbon-vs-madrid", "bangkok-vs-chiang",
+  "madrid-vs-barcelona", "dubai-vs-abu-dhabi", "singapore-vs-hong-kong",
+  "bali-vs-thailand", "lisbon-vs-porto-vs-algarve",
+  "medellin-vs-bogota", "kuala-lumpur-vs-penang",
+  "tbilisi-vs-batumi", "canggu-vs-ubud",
+  // Specific city guides (not country-level)
+  "move-to-tokyo", "move-to-bangkok", "move-to-milan", "move-to-rome",
+  "move-to-florence", "move-to-kuala-lumpur", "move-to-buenos-aires",
+  "move-to-penang", "move-to-fukuoka", "move-to-chiang-mai",
+  "move-to-phuket", "move-to-valencia-spain", "move-to-malaga",
+  "move-to-tenerife", "move-to-bogota", "move-to-algarve",
+  "move-to-madeira", "move-to-azores", "move-to-lisbon",
+  "move-to-porto", "move-to-athens", "move-to-budapest",
+  "move-to-belgrade", "move-to-tallinn", "move-to-prague",
+  "move-to-warsaw", "move-to-berlin", "move-to-vienna",
+  "move-to-stockholm", "move-to-amsterdam", "move-to-tbilisi",
+  "move-to-batumi", "move-to-kotor", "move-to-medellin",
+  "move-to-panama-city", "move-to-oaxaca", "move-to-playa-del-carmen",
+  "move-to-mexico-city", "move-to-ho-chi-minh", "move-to-hanoi",
+  "move-to-da-nang", "move-to-nairobi", "move-to-kyoto-osaka",
+  "move-to-abu-dhabi", "move-to-dubai-freelancer",
+  "move-to-south-france", "move-to-cape-town",
+  "move-to-slovenia", "move-to-north-macedonia",
+  "move-to-albania-riviera", "move-to-kotor",
+  "move-to-greek-islands",
+  // City-specific setup/budget/checklist
+  "tbilisi-neighborhood", "tbilisi-digital-nomad-setup",
+  "tbilisi-first-week", "tbilisi-budget",
+  "lisbon-budget", "lisbon-freelancer-setup", "lisbon-ultimate-setup",
+  "lisbon-american-taxes", "lisbon-american-guide",
+  "lisbon-family", "retire-to-lisbon",
+  "move-to-barcelona-nomad",
+  "dubai-remote-worker",
+  "best-cities", "best-coworking",
+];
+
+// Retirement slugs
+const RETIRE_SLUGS = [
+  "retire-to-", "retire-abroad", "retire-europe",
+  "pension-abroad", "social-security",
+  "retire-to-lisbon", "retire-to-spain", "retire-to-greece",
+  "retire-to-portugal",
 ];
 
 export function detectCategory(slug: string, frontmatterCategory?: string): string {
@@ -20,57 +70,44 @@ export function detectCategory(slug: string, frontmatterCategory?: string): stri
 
   const s = slug.toLowerCase();
 
-  // City guides (check before country — more specific)
-  if (
-    s.includes("neighborhood") ||
-    s.includes("lisbon-vs-porto") ||
-    s.includes("bangkok-vs-chiang") ||
-    s.includes("madrid-vs-barcelona") ||
-    s.includes("best-cities") ||
-    s.includes("best-coworking")
-  )
-    return "city";
+  // 1. Retirement (check before lifestyle — retire- overlaps)
+  if (RETIRE_SLUGS.some((k) => s.includes(k))) return "retire";
 
-  // Country guides
-  if (
-    s.startsWith("move-to-") ||
-    s.startsWith("moving-to-") ||
-    s.includes("expat-guide") ||
-    s.includes("expat-life")
-  )
-    return "country";
+  // 2. City guides (check before country — more specific)
+  if (CITY_SLUGS.some((k) => s.includes(k))) return "city";
 
-  // Visas & Residency
+  // 3. Visas & Residency
   if (
     s.includes("visa") ||
     s.includes("residency") ||
     s.includes("citizenship") ||
     s.includes("passport") ||
     s.includes("permit") ||
-    s.includes("permanent-residency") ||
     s.includes("schengen") ||
     s.includes("etias") ||
-    s.includes("eu-citizenship") ||
-    s.includes("second-passport")
-  )
-    return "visa";
+    s.includes("second-passport") ||
+    s.includes("apostille") ||
+    s.includes("nie-number") ||
+    s.includes("nif-number") ||
+    s.includes("permanent-residency")
+  ) return "visa";
 
-  // Taxes & Finance
+  // 4. Taxes & Finance
   if (
     s.includes("tax") ||
-    s.includes("finance") ||
     s.includes("invest") ||
     s.includes("banking") ||
-    s.includes("money") ||
+    s.includes("send-money") ||
     s.includes("cost-of-living") ||
     s.includes("cost-of-relocating") ||
     s.includes("salary") ||
     s.includes("crypto") ||
-    s.includes("renounce")
-  )
-    return "tax";
+    s.includes("renounce") ||
+    s.includes("expat-banking") ||
+    s.includes("visa-fees")
+  ) return "tax";
 
-  // Work & Freelance
+  // 5. Work & Freelance
   if (
     s.includes("freelanc") ||
     s.includes("remote-work") ||
@@ -79,16 +116,23 @@ export function detectCategory(slug: string, frontmatterCategory?: string): stri
     s.includes("job") ||
     s.includes("teaching") ||
     s.includes("developer") ||
-    s.includes("nurse") ||
-    s.includes("doctor") ||
+    s.includes("designer") ||
+    s.includes("lawyer") ||
     s.includes("negotiate") ||
     s.includes("open-company") ||
     s.includes("digital-nomad-tax") ||
-    s.includes("nomad-burnout")
-  )
-    return "work";
+    s.includes("nomad-burnout") ||
+    s.includes("remote-job") ||
+    s.includes("visa-sponsorship") ||
+    s.includes("healthcare-professional") ||
+    s.includes("entrepreneur") ||
+    s.includes("entrepass") ||
+    s.includes("time-zones") ||
+    s.includes("remote-work-tools") ||
+    s.includes("starlink")
+  ) return "work";
 
-  // Housing & Living
+  // 6. Housing & Living
   if (
     s.includes("apartment") ||
     s.includes("rent") ||
@@ -97,14 +141,21 @@ export function detectCategory(slug: string, frontmatterCategory?: string): stri
     s.includes("buy-property") ||
     s.includes("shipping") ||
     s.includes("bank-account") ||
-    s.includes("send-money") ||
+    s.includes("open-bank") ||
     s.includes("insurance") ||
     s.includes("health-insurance") ||
-    s.includes("healthcare")
-  )
-    return "living";
+    s.includes("healthcare") ||
+    s.includes("long-term-accommodation") ||
+    s.includes("driving-license") ||
+    s.includes("car-motorbike") ||
+    s.includes("power-of-attorney") ||
+    s.includes("inheritance") ||
+    s.includes("medical-tourism") ||
+    s.includes("dental-tourism") ||
+    s.includes("vpn")
+  ) return "living";
 
-  // Lifestyle
+  // 7. Lifestyle
   if (
     s.includes("family") ||
     s.includes("pets") ||
@@ -119,12 +170,26 @@ export function detectCategory(slug: string, frontmatterCategory?: string): stri
     s.includes("checklist") ||
     s.includes("no-money") ||
     s.includes("home-country") ||
-    s.includes("retire") ||
     s.includes("ai-tools") ||
     s.includes("cheapest") ||
-    s.includes("countries-pay")
-  )
-    return "lifestyle";
+    s.includes("countries-pay") ||
+    s.includes("homesickness") ||
+    s.includes("lgbt") ||
+    s.includes("solo-female") ||
+    s.includes("vegan") ||
+    s.includes("expat-communities") ||
+    s.includes("mental-health-support") ||
+    s.includes("culture-shock") ||
+    s.includes("best-expat-communities")
+  ) return "lifestyle";
+
+  // 8. Country guides (default for move-to- and general country articles)
+  if (
+    s.startsWith("move-to-") ||
+    s.startsWith("moving-to-") ||
+    s.includes("expat-guide") ||
+    s.includes("expat-life")
+  ) return "country";
 
   return "country";
 }
