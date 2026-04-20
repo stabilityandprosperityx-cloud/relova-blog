@@ -55,6 +55,16 @@ const CITY_SLUGS = [
   "move-to-barcelona-nomad",
   "dubai-remote-worker",
   "best-cities", "best-coworking",
+  // Batch 7 cities
+  "move-to-osaka", "move-to-busan", "move-to-vancouver",
+  "move-to-sydney-melbourne", "move-to-sao-paulo", "move-to-santiago",
+  "move-to-lima", "move-to-zurich-geneva", "move-to-scotland",
+  "move-to-tel-aviv", "move-to-amman", "move-to-oman",
+  "move-to-maldives", "lisbon-vs-barcelona", "dubai-vs-singapore",
+  "cape-town-vs-nairobi", "portugal-vs-italy-vs-greece",
+  "tbilisi-complete", "move-to-cape-verde",
+  "move-to-sri-lanka", "move-to-cambodia", "move-to-peru",
+  "move-to-chile", "move-to-iceland", "move-to-slovakia",
 ];
 
 // Retirement slugs
