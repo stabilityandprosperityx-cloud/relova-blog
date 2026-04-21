@@ -65,6 +65,19 @@ const CITY_SLUGS = [
   "tbilisi-complete", "move-to-cape-verde",
   "move-to-sri-lanka", "move-to-cambodia", "move-to-lima",
   "move-to-santiago", "move-to-iceland", "move-to-slovakia",
+  // Batch 8 cities
+  "move-to-yerevan", "move-to-tashkent", "move-to-almaty",
+  "move-to-pristina", "move-to-sarajevo",
+  "move-to-antigua-guatemala", "move-to-cuenca-ecuador",
+  "move-to-montreal", "move-to-toronto", "move-to-brisbane",
+  "move-to-istanbul-nomad", "move-to-izmir", "move-to-antalya",
+  "move-to-thessaloniki", "move-to-krakow", "move-to-wroclaw",
+  "move-to-gdansk", "move-to-accra", "move-to-zanzibar",
+  "move-to-qatar", "move-to-bahrain", "move-to-saudi",
+  "move-to-osaka", "move-to-busan",
+  "puerto-rico-expat", "move-to-barbados",
+  "move-to-dubrovnik-split", "move-to-lisbon-honest",
+  "lisbon-vs-barcelona",
 ];
 
 // Retirement slugs
@@ -73,6 +86,7 @@ const RETIRE_SLUGS = [
   "pension-abroad", "social-security",
   "retire-to-lisbon", "retire-to-spain", "retire-to-greece",
   "retire-to-portugal",
+  "retire-to-costa-rica",
 ];
 
 export function detectCategory(slug: string, frontmatterCategory?: string): string {
