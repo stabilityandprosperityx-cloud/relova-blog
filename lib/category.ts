@@ -78,6 +78,16 @@ const CITY_SLUGS = [
   "puerto-rico-expat", "move-to-barbados",
   "move-to-dubrovnik-split", "move-to-lisbon-honest",
   "lisbon-vs-barcelona",
+  // Batch 9
+  "move-to-naples", "move-to-sicily", "move-to-sardinia", "move-to-puglia",
+  "move-to-seville", "move-to-bilbao", "move-to-nice-france",
+  "move-to-bordeaux", "move-to-munich", "move-to-hamburg",
+  "move-to-lagos-nigeria", "move-to-cartagena-colombia",
+  "move-to-quito", "move-to-la-paz", "move-to-lviv",
+  "move-to-baku", "move-to-chisinau", "move-to-kathmandu",
+  "madrid-neighborhoods", "paris-neighborhoods", "berlin-neighborhoods",
+  "seoul-neighborhoods", "singapore-neighborhoods",
+  "mallorca-expat", "lanzarote-expat", "gran-canaria-expat",
 ];
 
 // Retirement slugs
@@ -87,6 +97,7 @@ const RETIRE_SLUGS = [
   "retire-to-lisbon", "retire-to-spain", "retire-to-greece",
   "retire-to-portugal",
   "retire-to-costa-rica",
+  "retire-to-sicily", "retire-to-puglia",
 ];
 
 export function detectCategory(slug: string, frontmatterCategory?: string): string {
@@ -153,7 +164,11 @@ export function detectCategory(slug: string, frontmatterCategory?: string): stri
     s.includes("entrepass") ||
     s.includes("time-zones") ||
     s.includes("remote-work-tools") ||
-    s.includes("starlink")
+    s.includes("starlink") ||
+    s.includes("engineer-abroad") ||
+    s.includes("marketing-professional") ||
+    s.includes("travel-hacking") ||
+    s.includes("credit-cards-expat")
   ) return "work";
 
   // 6. Housing & Living
