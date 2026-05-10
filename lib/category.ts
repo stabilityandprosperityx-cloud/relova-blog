@@ -88,6 +88,15 @@ const CITY_SLUGS = [
   "madrid-neighborhoods", "paris-neighborhoods", "berlin-neighborhoods",
   "seoul-neighborhoods", "singapore-neighborhoods",
   "mallorca-expat", "lanzarote-expat", "gran-canaria-expat",
+  // Batch 10
+  "move-to-tbilisi-2026-complete", "move-to-dubai-2026-complete",
+  "move-to-lisbon-2026-complete", "move-to-singapore-2026-complete",
+  "move-to-amsterdam-2026-complete", "move-to-barcelona-2026-complete",
+  "porto-neighborhoods", "split-vs-dubrovnik", "athens-vs-lisbon",
+  "move-to-lombok", "move-to-koh-samui", "move-to-langkawi",
+  "move-to-tbilisi-kutaisi", "move-to-georgia-second-city",
+  "best-cities-retirees", "best-cities-families-expat",
+  "move-to-nairobi-neighborhoods", "move-to-accra-neighborhoods",
 ];
 
 // Retirement slugs
@@ -98,6 +107,9 @@ const RETIRE_SLUGS = [
   "retire-to-portugal",
   "retire-to-costa-rica",
   "retire-to-sicily", "retire-to-puglia",
+  // Batch 10
+  "retire-to-ecuador", "retire-to-colombia", "retire-to-malaysia",
+  "retire-to-thailand", "retire-to-mexico",
 ];
 
 export function detectCategory(slug: string, frontmatterCategory?: string): string {
