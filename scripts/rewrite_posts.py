@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Rewrite templated/duplicated posts into unique, fact-driven articles.
 
-Decisions are driven by audit_report.csv: a post is rewritten when it has
-intra-page duplicate paragraphs OR a templated FAQ OR a high cross-page count.
-Genuinely unique (hand-written) posts are left untouched.
+The rewrite engine self-flags: every post is examined, and one is only touched
+when it actually carries shared filler, intra-page duplication, or a templated
+FAQ. Genuinely unique (hand-written) posts are reported as SKIP and left
+untouched. No dependency on a stale audit_report.csv.
 
 Usage:
     python scripts/rewrite_posts.py --dry-run          # report what would change
@@ -13,7 +14,6 @@ Usage:
 from __future__ import annotations
 
 import argparse
-import csv
 from pathlib import Path
 
 from content_lib import (
@@ -25,26 +25,6 @@ from content_lib import (
 
 ROOT = Path(__file__).resolve().parents[1]
 POSTS = ROOT / "content/posts"
-REPORT = ROOT / "audit_report.csv"
-
-CROSS_THRESHOLD = 4  # cross-page dup paragraphs that alone justify a rewrite
-
-
-def load_flags() -> dict[str, dict]:
-    flags: dict[str, dict] = {}
-    if not REPORT.exists():
-        return flags
-    with REPORT.open(encoding="utf-8") as f:
-        for row in csv.DictReader(f):
-            flags[row["slug"]] = row
-    return flags
-
-
-def should_rewrite(row: dict) -> bool:
-    intra = int(row.get("intra_page_duplicate_paragraphs_count", 0) or 0)
-    cross = int(row.get("cross_page_duplicate_paragraphs_count", 0) or 0)
-    faq = (row.get("faq_is_templated") or "false").lower() == "true"
-    return intra > 0 or faq or cross >= CROSS_THRESHOLD
 
 
 def split_raw_frontmatter(text: str) -> tuple[str, str]:
@@ -62,8 +42,8 @@ def rewrite_file(path: Path, boiler_p: set[str], boiler_t: set[str]) -> tuple[bo
         return False, "no frontmatter"
     post = parse_mdx(text)
     new_body, mode = rebuild_post(text, boiler_p, boiler_t)
-    if mode == "A" and not post.facts:
-        return False, "no extractable facts (skipped)"
+    if mode == "SKIP" or new_body is None:
+        return False, "SKIP (already clean)"
     if has_intra_duplication(new_body, post.topic):
         return False, "WARNING: rebuilt body still has intra dup (skipped)"
     new_text = raw_fm.rstrip() + "\n\n" + new_body
@@ -78,8 +58,6 @@ def main() -> None:
     ap.add_argument("--limit", type=int, default=0)
     args = ap.parse_args()
 
-    flags = load_flags()
-
     # Build the corpus-wide boilerplate index from ALL posts (shared paragraphs
     # and tables that appear in >= BOILERPLATE_MIN_SLUGS distinct articles).
     all_texts = [
@@ -92,46 +70,46 @@ def main() -> None:
         path = POSTS / f"{args.only}.mdx"
         body, mode = rebuild_post(path.read_text(encoding="utf-8"), boiler_p, boiler_t)
         print(f"[mode {mode}]\n")
-        print(body)
+        print(body if body is not None else "(unchanged)")
         return
 
-    targets = []
-    for path in sorted(POSTS.glob("*.mdx")):
-        slug = path.stem
-        row = flags.get(slug)
-        if row is None:
-            continue
-        if should_rewrite(row):
-            targets.append(path)
-
+    targets = sorted(POSTS.glob("*.mdx"))
     if args.limit:
         targets = targets[: args.limit]
 
-    print(f"{len(targets)} posts flagged for rewrite (of {len(flags)} audited).")
     if args.dry_run:
-        for p in targets[:30]:
-            print(f"  would rewrite: {p.stem}")
-        if len(targets) > 30:
-            print(f"  ... and {len(targets) - 30} more")
+        modes = {"A": 0, "B": 0, "C": 0, "SKIP": 0}
+        for p in targets:
+            body, mode = rebuild_post(p.read_text(encoding="utf-8"), boiler_p, boiler_t)
+            modes[mode] = modes.get(mode, 0) + 1
+        print(f"{len(targets)} posts examined.")
+        for m in ("A", "B", "C", "SKIP"):
+            print(f"  mode {m}: {modes.get(m, 0)}")
         return
 
     changed = 0
-    modes = {"A": 0, "B": 0}
+    modes = {"A": 0, "B": 0, "C": 0}
     skipped = []
+    warnings = []
     for p in targets:
         ok, msg = rewrite_file(p, boiler_p, boiler_t)
         if ok:
             changed += 1
-            if "(A)" in msg:
-                modes["A"] += 1
-            elif "(B)" in msg:
-                modes["B"] += 1
+            for m in ("A", "B", "C"):
+                if f"({m})" in msg:
+                    modes[m] += 1
+        elif msg.startswith("WARNING"):
+            warnings.append((p.stem, msg))
         else:
             skipped.append((p.stem, msg))
-    print(f"Rewrote {changed} posts (fact-rebuild A={modes['A']}, keep-clean B={modes['B']}).")
-    if skipped:
-        print(f"Skipped {len(skipped)}:")
-        for slug, msg in skipped[:40]:
+    print(
+        f"Rewrote {changed} posts "
+        f"(fact-rebuild A={modes['A']}, keep-clean B={modes['B']}, minimal C={modes['C']})."
+    )
+    print(f"Left untouched (already clean): {len(skipped)}.")
+    if warnings:
+        print(f"WARNINGS ({len(warnings)}):")
+        for slug, msg in warnings:
             print(f"  {slug}: {msg}")
 
 

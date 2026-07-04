@@ -306,6 +306,12 @@ _TABLE_FRAMES = [
 _HEDGE_PREFIX_RE = re.compile(r"^(~|about |around |roughly |approx\.? )+", re.IGNORECASE)
 
 
+def _is_sentence_value(value: str) -> bool:
+    """A table value that is already a full, article-specific sentence — in which
+    case the column label (often generic like 'Housing anchor') is noise."""
+    return len(value.split()) >= 7 or value.rstrip().endswith((".", "!", "?"))
+
+
 def _fact_sentence(fact: Fact, slug: str, idx: int) -> str:
     if fact.raw:
         s = fact.raw.strip()
@@ -316,6 +322,11 @@ def _fact_sentence(fact: Fact, slug: str, idx: int) -> str:
     # Normalise the value so a hedging frame ("roughly", "near") doesn't stack
     # on top of a value that already starts with "~" / "about".
     value = _HEDGE_PREFIX_RE.sub("", fact.value).strip()
+    if _is_sentence_value(value):
+        s = value[0].upper() + value[1:]
+        if not s.endswith((".", "!", "?")):
+            s += "."
+        return s
     note_paren = ""
     if fact.note and fact.note.lower() != value.lower():
         note_paren = f" ({fact.note})"
@@ -453,9 +464,13 @@ def _first_fact(post: ParsedPost, theme: str) -> Fact | None:
 def _fact_phrase(fact: Fact) -> str:
     if fact.raw:
         return fact.raw
-    if fact.note and fact.note.lower() != fact.value.lower():
-        return f"{fact.label} at {fact.value} ({fact.note})"
-    return f"{fact.label} at {fact.value}"
+    value = _HEDGE_PREFIX_RE.sub("", fact.value).strip()
+    # Drop generic column labels ("Housing anchor") when the value stands alone.
+    if _is_sentence_value(value):
+        return value.rstrip(".")
+    if fact.note and fact.note.lower() != value.lower():
+        return f"{fact.label} at {value} ({fact.note})"
+    return f"{fact.label} at {value}"
 
 
 # Suffix banks add practical guidance after the article-specific fact. They are
@@ -466,6 +481,9 @@ _Q1_SUFFIX = [
     "Rent is only the anchor — utilities, transport, and a first-month setup fund push the real number higher.",
     "Stack food, transport, insurance, and a currency buffer onto rent to get an honest monthly total.",
     "Treat that as the floor: add insurance, transport, and one overlap month of housing while you settle in.",
+    "Budget separately for deposits and agency fees, which routinely add a month or two of rent up front.",
+    "Remember that groceries, mobile data, and coworking can quietly rival rent in the first few months.",
+    "Pad the figure for exchange-rate swings if your income arrives in a different currency.",
 ]
 _Q2_SUFFIX = [
     "Confirm the exact figure and document list on the official immigration source the week you file, because thresholds shift.",
@@ -473,6 +491,8 @@ _Q2_SUFFIX = [
     "Check the live threshold and evidence checklist on the government portal before you commit, as numbers are revised often.",
     "Match your income proof to the current published requirement before booking an appointment; adjudicators benchmark strictly.",
     "Confirm eligibility and renewal duties with licensed counsel before moving money or booking flights.",
+    "Read the small print on renewal and time-in-country rules, since they often matter more than the entry threshold.",
+    "Line up apostilles and certified translations early, because they are the step that quietly delays most applications.",
 ]
 _Q3_SUFFIX = [
     "Details like this are easy to miss from abroad but shape daily life fast once you land.",
@@ -480,18 +500,24 @@ _Q3_SUFFIX = [
     "Small facts like this decide whether the first month feels smooth or stressful.",
     "This is exactly the sort of thing worth verifying before you sign anything.",
     "Plan around it early rather than discovering it after you have committed.",
+    "It rarely shows up in glossy relocation guides but hits your routine immediately.",
+    "Sorting it before departure saves a stressful scramble in your first weeks.",
 ]
 _Q4_SUFFIX = [
     "Buy private cover that names your destination explicitly until any public enrollment is active.",
     "Keep a policy that lists the country by name and includes evacuation until local coverage kicks in.",
     "Bridge with private insurance whose wording matches visa requirements before you rely on the public system.",
     "Carry comprehensive cover with clear inpatient limits until residency-based healthcare is confirmed.",
+    "Check whether your permit requires proof of insurance on day one, then buy accordingly.",
+    "Keep receipts and policy documents handy, since some registrations ask for them at the counter.",
 ]
 _Q5_SUFFIX = [
     "against your own income and timeline, then build a dated evidence folder before you pay any non-refundable deposit.",
     "against your real numbers, then sequence appointments before signing a lease or wiring a deposit.",
     "before anything else, then assemble document proof so paperwork never becomes the bottleneck.",
     "against your situation, then lock the legal steps before optimizing lifestyle or taxes.",
+    "against a conservative budget, then book the first official appointment before committing to housing.",
+    "before you fall for a neighborhood, then confirm the paperwork sequence so nothing stalls on arrival.",
 ]
 
 
@@ -512,6 +538,9 @@ def build_faq(post: ParsedPost) -> list[tuple[str, str]]:
                 f"How much does {topic} cost per month?",
                 f"What monthly budget should I plan for {topic}?",
                 f"Is {topic} affordable, and what are the real costs?",
+                f"What does {topic} realistically cost each month?",
+                f"How far does a mid-range budget go for {topic}?",
+                f"What are the true monthly numbers behind {topic}?",
             ],
             slug, "q1",
         )
@@ -524,6 +553,9 @@ def build_faq(post: ParsedPost) -> list[tuple[str, str]]:
                 f"What visa or residency route fits {topic}?",
                 f"Which permit should I prioritize for {topic}?",
                 f"How do I stay legally for {topic}?",
+                f"What is the cleanest legal path for {topic}?",
+                f"Which residency option makes {topic} workable?",
+                f"How do the visa rules actually apply to {topic}?",
             ],
             slug, "q2",
         )
@@ -537,6 +569,9 @@ def build_faq(post: ParsedPost) -> list[tuple[str, str]]:
                 f"What surprises people most about {topic}?",
                 f"What practical detail matters for {topic}?",
                 f"What should I check before committing to {topic}?",
+                f"What do people underestimate about {topic}?",
+                f"Which detail catches newcomers out with {topic}?",
+                f"What is easy to overlook when planning {topic}?",
             ],
             slug, "q3q",
         )
@@ -548,6 +583,8 @@ def build_faq(post: ParsedPost) -> list[tuple[str, str]]:
             [
                 f"How does healthcare work for {topic}?",
                 f"What should I know about health cover for {topic}?",
+                f"Is private or public health cover better for {topic}?",
+                f"How do I handle medical insurance for {topic}?",
             ],
             slug, "q4",
         )
@@ -561,6 +598,9 @@ def build_faq(post: ParsedPost) -> list[tuple[str, str]]:
                 f"What is the smartest first step for {topic}?",
                 f"Where should I start with {topic}?",
                 f"What should I do first when planning {topic}?",
+                f"What is the right opening move for {topic}?",
+                f"How should I begin planning {topic}?",
+                f"What comes first when preparing {topic}?",
             ],
             slug, "q5",
         )
@@ -571,6 +611,68 @@ def build_faq(post: ParsedPost) -> list[tuple[str, str]]:
         qa.append((q, a))
 
     return qa
+
+
+# Intro openers used only when an article's original intro is shared boilerplate.
+# Kept varied so rebuilt intros do not collapse into a single template, and each
+# intro leads with the article's own fact where one exists.
+_INTRO_OPENERS = [
+    "rewards people who anchor every decision to real numbers instead of vibes.",
+    "gets far easier when you treat it as a logistics project, not a daydream.",
+    "comes down to a handful of unglamorous choices you make before you book flights.",
+    "is mostly about sequencing money, documents, and timing in the right order.",
+    "trips up newcomers on the details that are hard to see from your home country.",
+    "works best when the plan survives first contact with a spreadsheet.",
+    "is less about luck and more about ticking the right boxes early.",
+    "starts with the paperwork and budget math most people postpone for too long.",
+    "hinges on a few numbers that decide whether the whole plan holds together.",
+    "goes smoothly for people who front-load the boring administrative work.",
+    "turns on timing: the order you tackle visas, housing, and banking matters.",
+    "is easier to get right when you separate the dream from the due diligence.",
+    "asks for a realistic budget and a document trail before anything romantic.",
+    "rewards early research into costs, permits, and the quirks of local bureaucracy.",
+    "comes together once you pin down the visa route and the true cost of living.",
+    "favors movers who plan around worst-case timelines, not brochure promises.",
+]
+
+
+_CTXLINK_TEMPLATES = [
+    "[{title}]({url}) covers a closely related route in more depth.",
+    "For a deeper dive, [{title}]({url}) is the companion guide.",
+    "See [{title}]({url}) if you are weighing nearby options.",
+    "If you are comparing paths, [{title}]({url}) is worth reading next.",
+    "[{title}]({url}) unpacks an adjacent option in more detail.",
+    "For the neighbouring scenario, start with [{title}]({url}).",
+    "Pair this with [{title}]({url}) for the fuller picture.",
+]
+
+
+def _ctxlink(title: str, url: str, slug: str) -> str:
+    tpl = _pick(_CTXLINK_TEMPLATES, slug, "ctxlink")
+    return tpl.format(title=title, url=url)
+
+
+def _unique_intro(post: ParsedPost) -> str:
+    """Build a fresh intro when the original is shared boilerplate.
+
+    Leads with the bold topic keyword, then the article's own headline fact so
+    the paragraph's opening words differ across pages that carry real data.
+    """
+    topic = (post.topic or post.frontmatter.get("title", "this move")).strip()
+    slug = post.slug
+    # Lead with structured (table) facts — desc-derived facts are often the shared
+    # marketing description, which would just re-introduce boilerplate. The bold
+    # topic acts as a lead-in label, then article-specific fact sentences follow,
+    # so the opening words differ across pages that carry real data.
+    table_facts = [f for f in post.facts if not f.raw]
+    if table_facts:
+        sentences = [_fact_sentence(table_facts[0], slug, 200)]
+        if len(table_facts) > 1:
+            sentences.append(_fact_sentence(table_facts[1], slug, 201))
+        intro = f"**{topic}** " + " ".join(sentences)
+        return re.sub(r"\s+", " ", intro).strip()
+    opener = _pick(_INTRO_OPENERS, slug, "intro-open")
+    return f"**{topic}** {opener}"
 
 
 # --------------------------------------------------------------------------
@@ -636,15 +738,7 @@ def build_body(post: ParsedPost) -> str:
     # In-body contextual internal link (Priority 6) — leads with linked title
     if post.related_links:
         title, url = post.related_links[0]
-        contextual = _pick(
-            [
-                f"[{title}]({url}) covers a closely related route in more depth.",
-                f"For a deeper dive, [{title}]({url}) is the companion guide.",
-                f"See [{title}]({url}) if you are weighing nearby options.",
-            ],
-            slug, "ctxlink",
-        )
-        parts.append(contextual)
+        parts.append(_ctxlink(title, url, slug))
 
     # Related guides block (kept)
     if post.related_line:
@@ -756,12 +850,37 @@ def iter_index_paragraphs(text: str):
         yield ("table", _norm_table(tm))
 
 
+# Populated by build_boilerplate_index: fact texts shared across many posts.
+# _BOILER_DESCFACTS holds description-derived blurbs reused verbatim; _BOILER_FACTS
+# holds table rows (label/value) that repeat across posts. Both are filtered out of
+# fact generation so we never emit shared data as body or FAQ content.
+_BOILER_DESCFACTS: set[str] = set()
+_BOILER_FACTS: set[str] = set()
+
+
+def _descfact_key(text: str) -> str:
+    # Signature = first 8 normalized words, so near-identical marketing blurbs
+    # (which diverge only in their tail) still collapse to one shared key.
+    words = re.sub(r"[^a-z0-9\s]", " ", text.lower()).split()
+    return " ".join(words[:8])
+
+
+def _factkey(f: "Fact") -> str:
+    return re.sub(r"[^a-z0-9\s]", " ", f"{f.label} {f.value}".lower()).strip()
+
+
 def build_boilerplate_index(texts: list[tuple[str, str]]) -> tuple[set[str], set[str]]:
-    """Return (boilerplate_paragraphs, boilerplate_tables) from (slug, text) list."""
+    """Return (boilerplate_paragraphs, boilerplate_tables) from (slug, text) list.
+
+    Also refreshes the module-level ``_BOILER_DESCFACTS`` and ``_BOILER_FACTS``
+    sets of shared description- and table-derived facts.
+    """
     from collections import defaultdict
 
     para_slugs: dict[str, set[str]] = defaultdict(set)
     table_slugs: dict[str, set[str]] = defaultdict(set)
+    descfact_slugs: dict[str, set[str]] = defaultdict(set)
+    fact_slugs: dict[str, set[str]] = defaultdict(set)
     for slug, text in texts:
         seen_p, seen_t = set(), set()
         for kind, norm in iter_index_paragraphs(text):
@@ -771,9 +890,23 @@ def build_boilerplate_index(texts: list[tuple[str, str]]) -> tuple[set[str], set
             elif kind == "table" and norm not in seen_t:
                 seen_t.add(norm)
                 table_slugs[norm].add(slug)
+        fm, body = strip_frontmatter(text)
+        topic = extract_topic(fm, body)
+        for f in _parse_desc_facts(fm.get("description", ""), topic):
+            descfact_slugs[_descfact_key(f.raw)].add(slug)
+        for tm in _TABLE_BLOCK_RE.findall(body):
+            for f in _parse_table_facts(tm.strip()):
+                fact_slugs[_factkey(f)].add(slug)
     boiler_p = {n for n, s in para_slugs.items() if len(s) >= BOILERPLATE_MIN_SLUGS}
     boiler_t = {n for n, s in table_slugs.items() if len(s) >= BOILERPLATE_MIN_SLUGS}
+    _BOILER_DESCFACTS.clear()
+    _BOILER_DESCFACTS.update(
+        k for k, s in descfact_slugs.items() if len(s) >= BOILERPLATE_MIN_SLUGS
+    )
+    _BOILER_FACTS.clear()
+    _BOILER_FACTS.update(k for k, s in fact_slugs.items() if len(s) >= BOILERPLATE_MIN_SLUGS)
     return boiler_p, boiler_t
+    
 
 
 def _faq_templated(pairs: list[tuple[str, str]], topic: str | None,
@@ -790,6 +923,7 @@ def _assemble_class_b(
     kept: list[tuple[str, str]],
     faq_pairs: list[tuple[str, str]],
     faq_is_templated: bool,
+    boiler_p: set[str] | None = None,
 ) -> str:
     slug = post.slug
     # Group kept blocks into (heading, [content]) sections; capture related line.
@@ -827,20 +961,22 @@ def _assemble_class_b(
 
     if post.related_links:
         title, url = post.related_links[0]
-        parts.append(_pick(
-            [
-                f"[{title}]({url}) covers a closely related route in more depth.",
-                f"For a deeper dive, [{title}]({url}) is the companion guide.",
-                f"See [{title}]({url}) if you are weighing nearby options.",
-            ],
-            slug, "ctxlink",
-        ))
+        parts.append(_ctxlink(title, url, slug))
     if related_line:
         parts.append(related_line)
     elif post.related_line:
         parts.append(post.related_line)
 
-    qa = build_faq(post) if faq_is_templated else faq_pairs
+    # Drop any FAQ answers that are shared boilerplate, then rebuild from facts
+    # if the FAQ was templated (falling back to whatever unique pairs remain).
+    bp = boiler_p or set()
+    clean_pairs = [
+        (q, a) for q, a in faq_pairs if normalize_paragraph(a, post.topic) not in bp
+    ]
+    if faq_is_templated:
+        qa = build_faq(post) or clean_pairs
+    else:
+        qa = clean_pairs
     if qa:
         faq_block = ["## Frequently Asked Questions"]
         for q, a in qa:
@@ -866,25 +1002,34 @@ def _refresh_facts(post: ParsedPost, boiler_t: set[str]) -> None:
     good_tables = [t.strip() for t in all_tables if _norm_table(t) not in boiler_t]
     facts: list[Fact] = []
     for t in good_tables:
-        facts += _parse_table_facts(t)
+        # Drop individual rows that repeat across many posts (shared data).
+        facts += [f for f in _parse_table_facts(t) if _factkey(f) not in _BOILER_FACTS]
     if len(facts) < 5:
-        facts += _parse_desc_facts(post.frontmatter.get("description", ""), post.topic)
+        for f in _parse_desc_facts(post.frontmatter.get("description", ""), post.topic):
+            # Skip description blurbs reused verbatim across many posts.
+            if _descfact_key(f.raw) in _BOILER_DESCFACTS:
+                continue
+            facts.append(f)
     post.facts = facts
     post.table_md = good_tables[0] if good_tables else ""
 
 
 # A post needs at least this many real, non-boilerplate facts to justify a
-# fact-driven rebuild; below it we fall back to a minimal de-duplicated clean.
-CLASS_A_MIN_FACTS = 4
+# fact-driven rebuild; below it we fall back to a minimal clean (boilerplate
+# still stripped). Kept low so a post with even a small real table gets its
+# shared filler replaced by fact-driven prose rather than merely de-duplicated.
+CLASS_A_MIN_FACTS = 2
 
 
-def rebuild_post(text: str, boiler_p: set[str], boiler_t: set[str]) -> tuple[str, str]:
-    """Rebuild one post. Returns (new_body, mode) where mode is 'B', 'A' or 'C'.
+def rebuild_post(text: str, boiler_p: set[str], boiler_t: set[str]) -> tuple[str | None, str]:
+    """Rebuild one post. Returns (new_body, mode).
 
-    * Class B  keeps the article's unique prose/tables, strips shared filler.
-    * Class A  rebuilds the body from the post's own (non-boilerplate) facts.
-    * Class C  minimal clean: the post has no unique data, so we only remove
-               intra-page duplication and keep one copy of what exists.
+    mode is one of:
+    * 'SKIP' the post is already clean (no shared filler / intra-dup / templated
+             FAQ); new_body is None and the caller must leave the file untouched.
+    * 'B'    keep the article's unique prose/tables, strip shared filler.
+    * 'A'    rebuild the body from the post's own (non-boilerplate) facts.
+    * 'C'    minimal clean: no usable facts, so keep only non-boilerplate prose.
     """
     post = parse_mdx(text)
     intro, sections_text, faq_text = _split_regions(post.body)
@@ -892,46 +1037,94 @@ def rebuild_post(text: str, boiler_p: set[str], boiler_t: set[str]) -> tuple[str
     topic = post.topic
 
     kept_strict: list[tuple[str, str]] = []   # boilerplate + intra-dup removed
-    kept_minimal: list[tuple[str, str]] = []  # intra-dup removed only
     seen_norms: set[str] = set()
     seen_tables: set[str] = set()
+    para_norms: list[str] = []
+    has_boiler = False
     for kind, b in blocks:
         if kind in ("toc", "hr", "jsonld", "cta"):
             continue
         if kind == "para":
             norm = normalize_paragraph(b, topic)
+            long_enough = len(norm.split()) >= 8
+            if long_enough:
+                para_norms.append(norm)
+                if norm in boiler_p:
+                    has_boiler = True
             if norm in seen_norms:
                 continue
             seen_norms.add(norm)
-            kept_minimal.append((kind, b))
-            if not (len(norm.split()) >= 8 and norm in boiler_p):
+            if not (long_enough and norm in boiler_p):
                 kept_strict.append((kind, b))
         elif kind == "table":
             tn = _norm_table(b)
             if tn in seen_tables:
                 continue
             seen_tables.add(tn)
-            kept_minimal.append((kind, b))
-            if tn not in boiler_t:
+            if tn in boiler_t:
+                has_boiler = True
+            else:
                 kept_strict.append((kind, b))
         else:
-            kept_minimal.append((kind, b))
             kept_strict.append((kind, b))
+
+    faq_pairs = _parse_faq_pairs(faq_text)
+    templated = bool(faq_pairs) and _faq_templated(faq_pairs, topic, boiler_p)
+    faq_boiler = any(
+        len((nn := normalize_paragraph(a, topic)).split()) >= 8 and nn in boiler_p
+        for _q, a in faq_pairs
+    )
+    intra_dup = len(para_norms) != len(set(para_norms))
+
+    # The intro region may hold several paragraphs (lead + shared CTA blurbs).
+    # Keep the article-specific lead, but drop any shared/boilerplate paragraphs.
+    intro_paras = [p.strip() for p in re.split(r"\n\s*\n", intro) if p.strip()] if intro else []
+    lead = intro_paras[0] if intro_paras else ""
+    lead_norm = normalize_paragraph(lead, topic) if lead else ""
+    lead_is_boiler = bool(lead_norm) and len(lead_norm.split()) >= 8 and lead_norm in boiler_p
+    kept_intro_extra: list[str] = []
+    for p in intro_paras[1:]:
+        n = normalize_paragraph(p, topic)
+        if len(n.split()) >= 8 and n in boiler_p:
+            has_boiler = True  # shared blurb/CTA hiding above the first heading
+            continue
+        kept_intro_extra.append(p)
+
+    # Comprehensive boilerplate check across every region (intro, sections, FAQ,
+    # trailing promos) so a shared paragraph anywhere prevents a wrongful SKIP.
+    if not has_boiler:
+        for p in split_body_paragraphs(post.body):
+            n = normalize_paragraph(p, topic)
+            if len(n.split()) >= 8 and n in boiler_p:
+                has_boiler = True
+                break
+
+    # Already-clean article (e.g. hand-written editorial): leave it untouched.
+    if not has_boiler and not intra_dup and not templated and not lead_is_boiler \
+            and not faq_boiler:
+        return None, "SKIP"
+
+    # Recompute facts from NON-boilerplate tables + description up front so both
+    # the intro rebuild and the Class A decision can use them.
+    _refresh_facts(post, boiler_t)
+
+    # Replace a shared/boilerplate lead with a fact-led, per-article one.
+    if lead_is_boiler or not lead:
+        lead = _unique_intro(post)
+    intro = "\n\n".join([lead, *kept_intro_extra])
+    post.intro = intro
 
     unique_paras = [b for k, b in kept_strict if k == "para"]
     words = sum(len(b.split()) for b in unique_paras)
-    faq_pairs = _parse_faq_pairs(faq_text)
-    templated = _faq_templated(faq_pairs, topic, boiler_p)
 
     if len(unique_paras) >= CLASS_B_MIN_PARAS and words >= CLASS_B_MIN_WORDS:
-        return _assemble_class_b(post, intro, kept_strict, faq_pairs, templated), "B"
+        return _assemble_class_b(post, intro, kept_strict, faq_pairs, templated, boiler_p), "B"
 
-    _refresh_facts(post, boiler_t)
     if len(post.facts) >= CLASS_A_MIN_FACTS:
         return build_body(post), "A"
 
-    # Class C — nothing unique to work with; just de-duplicate what exists.
-    return _assemble_class_b(post, intro, kept_minimal, faq_pairs, templated), "C"
+    # Class C — no usable facts; keep only the non-boilerplate prose that exists.
+    return _assemble_class_b(post, intro, kept_strict, faq_pairs, templated, boiler_p), "C"
 
 
 def has_intra_duplication(body: str, topic: str | None = None, threshold: int = 0) -> bool:
