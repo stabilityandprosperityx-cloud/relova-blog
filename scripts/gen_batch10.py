@@ -1,56 +1,23 @@
 #!/usr/bin/env python3
-"""Generate Batch 10 SEO MDX posts (40 articles)."""
+"""Generate Batch 10 SEO MDX posts (40 articles).
+
+Body sections and FAQ are synthesised from each spec's OWN facts (the
+comparison table + description) by ``content_lib.render_post_from_spec``, which
+also runs a pre-save duplication guard. This replaces the old shared
+SENTENCE_POOL that produced near-duplicate pages. Use this file as the
+template for batch 11+.
+"""
 from __future__ import annotations
 
-import hashlib
-import json
 import re
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 POSTS = ROOT / "content/posts"
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-SENTENCE_POOL = [
-    "Treat every appointment window as a project milestone with a backup date, because consulates and immigration offices slip more often than first-time movers expect.",
-    "Keep PDFs of bank statements, tax returns, and employment letters in one dated folder so you can re-export the same month range if an officer asks for a refresh.",
-    "If your income is split across currencies, show the conversion methodology on a one-page sheet so reviewers do not invent their own FX assumptions.",
-    "Short-term furnished housing is usually cheaper than breaking a bad twelve-month lease after you discover noise, mold, or a dishonest landlord.",
-    "Buy travel medical cover that starts the day you board the plane, not the day you land, because delays and diversions happen on high-stress moving weeks.",
-    "When you open a local bank account, ask explicitly about monthly fees, SWIFT receiving charges, and whether US-person or FATCA rules trigger extra paperwork.",
-    "Join two communities before you arrive: one professional and one purely social, so your first month does not depend on a single group for all human contact.",
-    "Photograph meter readings, fuse boxes, and any wall damage at move-in so your deposit story stays factual if a dispute appears later.",
-    "Carry a printed list of emergency numbers, your blood type, and drug allergies in the local language for clinics that still prefer paper triage at the door.",
-    "Negotiate remote work hours in writing before you sign a lease in a time zone that makes your current standups impossible without sleep loss.",
-    "For families, align school application deadlines with visa issuance dates, because many schools will not hold a seat without proof of lawful stay.",
-    "Scan passports, marriage certificates, and degree diplomas at 300 dpi so reprints are never the bottleneck when a portal rejects an upload for resolution.",
-    "If you freelance, keep invoices and contracts that match the name on your bank account exactly, because mismatched payees trigger compliance reviews.",
-    "Budget for certified translations even when English is widely spoken, because some housing boards and vehicle registries still demand sworn versions.",
-    "Use a password manager shared vault only with your partner or executor, not with casual roommates, because recovery codes are effectively master keys.",
-    "After arrival, register your address everywhere the law requires before you optimize tax strategy, because penalties for late registration are common.",
-    "If you plan to buy property, separate the emotional tour from the legal due diligence phase so you do not waive contingencies under time pressure.",
-    "Track visa days in a spreadsheet if you split time between two countries, because tax residency and immigration residency follow different counting rules.",
-    "When comparing cities, weight healthcare access and pediatric wait times as heavily as rent per square meter if you have chronic conditions or children.",
-    "Keep one credit card from your home country active with a small recurring charge so the issuer does not auto-close the account while you are abroad.",
-    "Model three scenarios—base case, weak currency, and delayed visa—so you do not drain savings when one government office moves slowly.",
-    "Before you ship household goods, compare door-to-door quotes against buying locally, because used furniture markets in warm climates often beat freight.",
-    "If you drive, renew your home-country licence early; some destinations only honour licences for a short grace period after entry.",
-    "For remote workers, test backup internet with a local SIM and a portable router before your first critical client deadline abroad.",
-    "When landlords ask for cash deposits, insist on receipts and photograph serial numbers on appliances so disputes stay factual.",
-    "If you invest while abroad, document tax residency changes before opening brokerage accounts, because W-8 and CRS classifications follow facts not intent.",
-    "Children benefit when one parent handles schools and the other handles housing, because both workstreams have different document stacks and timelines.",
-    "Pet moves require microchip, rabies titre timing, and airline-specific crates—book the vet calendar before you book human flights.",
-    "Dual-status tax years happen more often than people expect; model withholding and instalments with a cross-border accountant before December.",
-    "Power-of-attorney at home should be scoped narrowly and time-limited so relatives cannot accidentally encumber assets you still need abroad.",
-    "If you teach or consult locally, confirm whether work permission is bundled with your visa or requires a separate labour step.",
-    "Seasonal tourism swings rents; negotiate move-in dates against low season when possible, especially on islands and ski towns.",
-    "Embassy STEP enrollment and local emergency SMS alerts are free insurance against civil unrest or natural disasters.",
-    "When co-working spaces bundle mail handling, verify whether the address satisfies banks and immigration or only satisfies couriers.",
-    "If you marry abroad, check whether your home country requires an apostille chain for the certificate before you file taxes jointly.",
-    "Student debt and mortgages at home still need autopay calendars; time-zone shifts cause more missed payments than people admit.",
-    "Photograph visa stamps on entry and exit; some residence renewals ask for travel history you no longer have in passport form.",
-    "If you hire domestic help, learn local labour rules; informal arrangements can invalidate liability insurance or residency proofs.",
-    "Currency controls in transit countries can block card withdrawals; carry two card networks and a modest USD or EUR cash buffer.",
-]
+from content_lib import render_post_from_spec  # noqa: E402
 
 CTAS = [
     "Map your next move with [Relova](https://relova.ai) so visas, housing, and money flows stay in one coherent plan.",
@@ -79,24 +46,6 @@ def make_desc(kw: str, rest: str) -> str:
     return base
 
 
-def filler_paragraphs(slug: str, count: int) -> list[str]:
-    h = int(hashlib.md5(slug.encode()).hexdigest(), 16)
-    return [SENTENCE_POOL[(h + i) % len(SENTENCE_POOL)] for i in range(count)]
-
-
-FILL_PER_SECTION = 18
-
-
-def faq_schema_questions(kw: str) -> list[str]:
-    return [
-        f"What visa, permit, or residency route should I prioritize for {kw}?",
-        f"What monthly budget is realistic for {kw}?",
-        f"Which destinations, neighborhoods, or trade-offs matter most for {kw}?",
-        f"What healthcare, insurance, or compliance gaps trip people up with {kw}?",
-        f"When does hiring a lawyer, agent, or tax adviser pay for itself with {kw}?",
-    ]
-
-
 def write_post(
     i: int,
     title: str,
@@ -107,96 +56,24 @@ def write_post(
     links: list[str],
     intro: str,
     table_md: str,
-    faq_answers: list[str],
+    faq_answers: list[str] | None = None,
 ) -> None:
+    # faq_answers are no longer templated in; the engine derives a unique,
+    # fact-specific FAQ from the table/description. The argument is kept so the
+    # existing SPECS tuples still unpack cleanly.
     desc = make_desc(kw, desc_rest)
-    h2_titles = [
-        f"{kw}: visas, housing rules, and first appointments",
-        f"{kw}: monthly budget bands and hidden setup costs",
-        f"{kw}: neighborhood comparison table and commute logic",
-        f"{kw}: healthcare, banking, and workspace setup",
-        f"{kw}: 90-day execution plan and risk checklist",
-    ]
-    toc = "\n".join(f"- [{h}](#{slugify(h)})" for h in h2_titles)
-    parts = [
-        "---",
-        f'title: "{title}"',
-        f'description: "{desc}"',
-        f'date: "{date}"',
-        f"slug: {slug}",
-        'author: "Relova Team"',
-        'ogImage: "/images/blog-default.jpg"',
-        "---",
-        "",
-        f"**{kw}** {intro}",
-        "",
-        "## Table of Contents",
-        toc,
-        "",
-    ]
-    for h in h2_titles:
-        parts += [f"## {h}", ""]
-        for p in filler_paragraphs(f"{slug}-{h}", FILL_PER_SECTION):
-            parts += [p, ""]
-    parts += [
-        table_md,
-        "",
-        "Related guides on this blog: "
-        + ", ".join(
-            [
-                f"[{s.replace('-', ' ').title()}](https://blog.relova.ai/blog/{s})"
-                for s in links
-            ]
-        )
-        + ".",
-        "",
-        "## Frequently Asked Questions",
-        "",
-    ]
-    q_list = faq_schema_questions(kw)
-    faq_ld = []
-    for q, a in zip(q_list, faq_answers):
-        parts += [f"**{q}**", "", a, ""]
-        faq_ld.append(
-            {
-                "@type": "Question",
-                "name": q,
-                "acceptedAnswer": {"@type": "Answer", "text": a},
-            }
-        )
-    parts += ["---", CTAS[i % len(CTAS)], ""]
-    art = {
-        "@context": "https://schema.org",
-        "@type": "Article",
-        "headline": title,
-        "description": desc,
-        "datePublished": date,
-        "dateModified": date,
-        "author": {"@type": "Organization", "name": "Relova Team"},
-        "publisher": {"@type": "Organization", "name": "Relova", "url": "https://relova.ai"},
-        "mainEntityOfPage": {"@type": "WebPage", "@id": f"https://blog.relova.ai/blog/{slug}"},
-    }
-    faq_schema = {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": faq_ld}
-
-    def esc_json(obj) -> str:
-        return (
-            json.dumps(obj, ensure_ascii=False)
-            .replace("\\", "\\\\")
-            .replace("`", "\\`")
-            .replace("${", "\\${")
-        )
-
-    parts += [
-        "<JsonLd>",
-        "{`" + esc_json(art) + "`}",
-        "</JsonLd>",
-        "",
-        "<JsonLd>",
-        "{`" + esc_json(faq_schema) + "`}",
-        "</JsonLd>",
-        "",
-    ]
-    (POSTS / f"{slug}.mdx").write_text("\n".join(parts), encoding="utf-8")
+    mdx = render_post_from_spec(
+        title=title,
+        slug=slug,
+        date=date,
+        kw=kw,
+        description=desc,
+        links=links,
+        intro=intro,
+        table_md=table_md,
+        cta=CTAS[i % len(CTAS)],
+    )
+    (POSTS / f"{slug}.mdx").write_text(mdx, encoding="utf-8")
 
 
 def F(*answers: str) -> list[str]:
