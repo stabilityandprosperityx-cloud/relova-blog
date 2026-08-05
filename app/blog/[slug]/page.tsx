@@ -67,22 +67,22 @@ export default async function BlogPostPage({ params }: Props) {
     <>
       <BlogPostingJsonLd post={post} url={pageUrl} />
       <article className="mx-auto max-w-3xl px-4 py-14 sm:px-6 sm:py-20">
-        <div className="rounded-xl border border-accent/10 bg-card px-5 py-8 sm:px-8 sm:py-10">
+        <div className="rounded-xl border border-border bg-card px-5 py-8 sm:px-8 sm:py-10">
           <p className="text-[13px] font-medium">
-            <Link href="/blog" className="text-accent transition-colors hover:text-accent/85">
+            <Link href="/blog" className="text-primary transition-colors hover:text-primary/85">
               Blog
             </Link>
-            <span className="mx-2 text-white/20">/</span>
-            <span className="tabular-nums text-muted">{formatDate(post.date)}</span>
+            <span className="mx-2 text-muted-foreground/40">/</span>
+            <span className="tabular-nums text-muted-foreground">{formatDate(post.date)}</span>
           </p>
-          <h1 className="mt-4 text-3xl font-semibold tracking-tight text-white sm:text-[2.25rem] sm:leading-[1.15]">
+          <h1 className="mt-4 text-3xl font-semibold tracking-tight text-foreground sm:text-[2.25rem] sm:leading-[1.15]">
             {post.title}
           </h1>
-          <p className="mt-3 text-sm text-muted">By {post.author}</p>
-          <p className="mt-6 text-lg leading-relaxed text-muted">{post.description}</p>
+          <p className="mt-3 text-sm text-muted-foreground">By {post.author}</p>
+          <p className="mt-6 text-lg leading-relaxed text-muted-foreground">{post.description}</p>
         </div>
 
-        <div className="prose prose-lg prose-invert mt-12 max-w-none prose-headings:scroll-mt-24 prose-headings:font-semibold prose-headings:tracking-tight prose-h2:mt-12 prose-h2:text-white prose-h3:mt-8 prose-h3:text-white prose-p:leading-[1.75] prose-a:font-medium prose-a:text-accent prose-a:no-underline hover:prose-a:text-accent/90 hover:prose-a:underline prose-strong:font-semibold prose-strong:text-white prose-li:marker:text-accent/80">
+        <div className="prose prose-lg mt-12 max-w-none prose-headings:scroll-mt-24 prose-headings:font-serif prose-headings:font-semibold prose-headings:tracking-tight prose-headings:text-foreground prose-h2:mt-12 prose-h3:mt-8 prose-p:leading-[1.75] prose-p:text-muted-foreground prose-a:font-medium prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-strong:font-semibold prose-strong:text-foreground prose-li:text-muted-foreground prose-li:marker:text-primary/80 prose-blockquote:border-primary prose-blockquote:text-muted-foreground prose-code:rounded prose-code:bg-muted prose-code:px-1 prose-code:text-primary prose-pre:border prose-pre:border-border prose-pre:bg-card">
           <MDXRemote
             source={post.content}
             components={mdxComponents}

@@ -31,12 +31,12 @@ export const mdxComponents = {
   a: (props: AnchorHTMLAttributes<HTMLAnchorElement>) => (
     <a
       {...props}
-      className="font-medium text-accent underline-offset-2 hover:text-accent/90 hover:underline"
+      className="font-medium text-primary underline-offset-2 hover:text-primary/90 hover:underline"
     />
   ),
 
   table: ({ className, children, ...props }: TableHTMLAttributes<HTMLTableElement>) => (
-    <div className="mdx-table-scroll my-8 w-full overflow-x-auto rounded-lg border border-[rgba(255,255,255,0.1)] bg-[#12121A]">
+    <div className="mdx-table-scroll my-8 w-full overflow-x-auto rounded-lg border border-border bg-card">
       <table
         {...props}
         className={cx(
@@ -50,7 +50,7 @@ export const mdxComponents = {
   ),
 
   thead: ({ className, ...props }: HTMLAttributes<HTMLTableSectionElement>) => (
-    <thead {...props} className={cx("bg-[rgba(255,255,255,0.08)]", className)} />
+    <thead {...props} className={cx("bg-secondary", className)} />
   ),
 
   tbody: ({ className, ...props }: HTMLAttributes<HTMLTableSectionElement>) => (
@@ -65,7 +65,7 @@ export const mdxComponents = {
     <th
       {...props}
       className={cx(
-        "border border-[rgba(255,255,255,0.1)] px-4 py-3 align-top text-sm font-semibold text-white",
+        "border border-border px-4 py-3 align-top text-sm font-semibold text-foreground",
         className,
       )}
     />
@@ -75,7 +75,7 @@ export const mdxComponents = {
     <td
       {...props}
       className={cx(
-        "border border-[rgba(255,255,255,0.1)] px-4 py-3 align-top text-muted",
+        "border border-border px-4 py-3 align-top text-muted-foreground",
         className,
       )}
     />

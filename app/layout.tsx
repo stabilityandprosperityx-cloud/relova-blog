@@ -28,14 +28,19 @@ export const metadata: Metadata = {
   },
 };
 
+const themeInitScript = `(function(){try{if(localStorage.getItem('relova-theme')==='dark'){document.documentElement.classList.add('dark');}}catch(e){}})();`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
-      <body className="flex min-h-screen flex-col font-sans selection:bg-accent/20 selection:text-white">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
+      <body className="flex min-h-screen flex-col font-sans selection:bg-primary/20 selection:text-foreground">
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />

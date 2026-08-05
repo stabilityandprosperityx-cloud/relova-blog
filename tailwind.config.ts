@@ -6,50 +6,54 @@ const config: Config = {
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
-  darkMode: "class",
+  darkMode: ["class"],
   theme: {
     extend: {
-      colors: {
-        surface: "#0A0A0F",
-        card: "#12121A",
-        accent: "#38BDF8",
-        muted: "#94A3B8",
-        terracotta: "#E07A5F",
-        navy: "#2D3561",
-        cream: "#F4F1DE",
-      },
       fontFamily: {
-        sans: [
-          "ui-sans-serif",
-          "system-ui",
-          "-apple-system",
-          "BlinkMacSystemFont",
-          "Segoe UI",
-          "sans-serif",
-        ],
+        sans: ["Inter", "system-ui", "-apple-system", "sans-serif"],
+        serif: ["Fraunces", "Georgia", "serif"],
+        mono: ["JetBrains Mono", "monospace"],
       },
-      typography: () => ({
-        invert: {
-          css: {
-            "--tw-prose-body": "#94A3B8",
-            "--tw-prose-headings": "#ffffff",
-            "--tw-prose-lead": "#94A3B8",
-            "--tw-prose-links": "#38BDF8",
-            "--tw-prose-bold": "#ffffff",
-            "--tw-prose-counters": "#38BDF8",
-            "--tw-prose-bullets": "#38BDF8",
-            "--tw-prose-hr": "rgb(56 189 248 / 0.2)",
-            "--tw-prose-quotes": "#94A3B8",
-            "--tw-prose-quote-borders": "rgb(56 189 248 / 0.25)",
-            "--tw-prose-captions": "#94A3B8",
-            "--tw-prose-code": "#ffffff",
-            "--tw-prose-pre-code": "rgb(255 255 255 / 0.9)",
-            "--tw-prose-pre-bg": "#12121A",
-            "--tw-prose-th-borders": "rgb(56 189 248 / 0.15)",
-            "--tw-prose-td-borders": "rgb(255 255 255 / 0.06)",
-          },
+      borderRadius: {
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
+      },
+      colors: {
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
+        primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
         },
-      }),
+        secondary: {
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
+        },
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
+        },
+        accent: {
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
+        },
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
+        },
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
+        },
+      },
     },
   },
   plugins: [require("@tailwindcss/typography")],
