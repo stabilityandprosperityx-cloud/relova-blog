@@ -334,6 +334,39 @@ def score_pair(a: Post, b: Post) -> tuple[int, list[str]]:
     return score, reasons
 
 
+def coarse_link_reason(post: Post, other: Post) -> str | None:
+    """Human reason from slug/title shape when score_pair has no entity overlap."""
+    a, b = post.slug, other.slug
+
+    def both(pred) -> bool:
+        return pred(a) and pred(b)
+
+    if both(lambda s: s.startswith("move-to")):
+        return "another relocation destination"
+    if both(lambda s: "retire" in s):
+        return "related retirement guide"
+    if both(lambda s: "neighborhood" in s):
+        return "related neighborhood guide"
+    if both(lambda s: "digital-nomad" in s or "nomad-visa" in s):
+        return "related nomad visa guide"
+    return None
+
+
+def pass3_reason(post: Post, other: Post) -> str:
+    """Reason for token-fallback picks. Never mention token counts.
+
+    Hierarchy: score_pair human reason → coarse slug/title → neutral fallback.
+    Returned lowercase, no trailing period (reason_blurb formats it).
+    """
+    _sc, reasons = score_pair(post, other)
+    if reasons:
+        return reasons[0]
+    coarse = coarse_link_reason(post, other)
+    if coarse:
+        return coarse
+    return "also worth reading"
+
+
 def pick_related(post: Post, all_posts: list[Post], n: int = 4) -> list[tuple[Post, list[str], int]]:
     scored: list[tuple[int, Post, list[str]]] = []
     for other in all_posts:
@@ -399,7 +432,7 @@ def pick_related(post: Post, all_posts: list[Post], n: int = 4) -> list[tuple[Po
             soft.append((ov, other))
     soft.sort(key=lambda x: (-x[0], x[1].slug))
     for ov, other in soft:
-        accept(other, [f"shared topic signals ({ov} tokens)"], ov)
+        accept(other, [pass3_reason(post, other)], ov)
         if len(picked) >= 3:
             break
 
