@@ -1,3 +1,5 @@
+import { getAuthorByName } from "@/lib/authors";
+import { lastmodIsoForPost } from "@/lib/post-lastmod";
 import { absoluteUrl } from "@/lib/site";
 import type { PostFrontmatter } from "@/lib/posts";
 
@@ -8,17 +10,19 @@ type Props = {
 
 export function BlogPostingJsonLd({ post, url }: Props) {
   const imageUrl = absoluteUrl(post.ogImage);
+  const author = getAuthorByName(post.author);
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "BlogPosting",
+    "@type": "Article",
     headline: post.title,
     description: post.description,
     image: [imageUrl],
     datePublished: post.date,
-    dateModified: post.date,
+    dateModified: lastmodIsoForPost(post.slug, post.date),
     author: {
       "@type": "Person",
-      name: post.author,
+      name: author.name,
+      url: absoluteUrl(author.path),
     },
     publisher: {
       "@type": "Organization",

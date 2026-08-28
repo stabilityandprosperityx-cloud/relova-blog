@@ -18,10 +18,19 @@ function JsonLd({ children }: { children?: ReactNode }) {
       : Array.isArray(children)
         ? children.map(String).join("")
         : String(children ?? "");
+  const trimmed = raw.trim();
+  try {
+    const parsed = JSON.parse(trimmed) as { "@type"?: string };
+    // Article JSON-LD is emitted from BlogPostingJsonLd with Person + git dateModified.
+    // Skip the older MDX copy so Google does not see a conflicting Organization author.
+    if (parsed["@type"] === "Article") return null;
+  } catch {
+    // Fall through and still emit unparseable payloads.
+  }
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: raw.trim() }}
+      dangerouslySetInnerHTML={{ __html: trimmed }}
     />
   );
 }

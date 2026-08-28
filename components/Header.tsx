@@ -12,12 +12,18 @@ export function Header() {
           Relova Blog
         </Link>
         <div className="flex items-center gap-1 sm:gap-2">
-          <nav className="text-[13px] font-medium text-muted-foreground sm:text-sm">
+          <nav className="flex items-center text-[13px] font-medium text-muted-foreground sm:text-sm">
             <Link
               href="/blog"
               className="rounded-md px-2 py-1 transition-colors hover:bg-secondary hover:text-foreground"
             >
               All posts
+            </Link>
+            <Link
+              href="/about"
+              className="rounded-md px-2 py-1 transition-colors hover:bg-secondary hover:text-foreground"
+            >
+              About
             </Link>
           </nav>
           <ThemeToggle />

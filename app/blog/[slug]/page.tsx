@@ -5,6 +5,7 @@ import rehypeSlug from "rehype-slug";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import { BlogPostingJsonLd } from "@/components/BlogPostingJsonLd";
 import { mdxComponents } from "@/components/mdx-components";
+import { getAuthorByName } from "@/lib/authors";
 import { getPostBySlug, getPostSlugs } from "@/lib/posts";
 import { absoluteUrl } from "@/lib/site";
 import Link from "next/link";
@@ -62,6 +63,7 @@ export default async function BlogPostPage({ params }: Props) {
   if (!post) notFound();
 
   const pageUrl = absoluteUrl(`/blog/${post.slug}`);
+  const author = getAuthorByName(post.author);
 
   return (
     <>
@@ -78,7 +80,12 @@ export default async function BlogPostPage({ params }: Props) {
           <h1 className="mt-4 text-3xl font-semibold tracking-tight text-foreground sm:text-[2.25rem] sm:leading-[1.15]">
             {post.title}
           </h1>
-          <p className="mt-3 text-sm text-muted-foreground">By {post.author}</p>
+          <p className="mt-3 text-sm text-muted-foreground">
+            By{" "}
+            <Link href={author.path} className="text-primary transition-colors hover:text-primary/85">
+              {author.name}
+            </Link>
+          </p>
           <p className="mt-6 text-lg leading-relaxed text-muted-foreground">{post.description}</p>
         </div>
 
