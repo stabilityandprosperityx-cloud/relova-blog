@@ -30,6 +30,8 @@ export default function AboutPage() {
       name: DEFAULT_AUTHOR.name,
       url: absoluteUrl(DEFAULT_AUTHOR.path),
       jobTitle: DEFAULT_AUTHOR.jobTitle,
+      knowsAbout: DEFAULT_AUTHOR.knowsAbout,
+      hasCredential: DEFAULT_AUTHOR.hasCredential,
       worksFor: {
         "@type": "Organization",
         name: "Relova",
@@ -63,7 +65,9 @@ export default function AboutPage() {
             Relova is a relocation planning product, and this blog is where we publish the
             research behind it. It is written by{" "}
             <Link href={DEFAULT_AUTHOR.path}>{DEFAULT_AUTHOR.name}</Link>, Relova’s founder — not
-            by a large newsroom, and not by licensed immigration lawyers.
+            by a large newsroom. Anna holds a law degree and spent over 10 years working in the
+            legal field, including at a relocation company in Cyprus. Relova is not a law firm,
+            and this blog is not a substitute for a licensed immigration lawyer.
           </p>
           <p>
             The problem we started with is familiar if you have ever tried to move countries: visa

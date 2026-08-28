@@ -41,6 +41,8 @@ export default function AuthorPage({ params }: Props) {
     url: absoluteUrl(author.path),
     jobTitle: author.jobTitle,
     description: author.paragraphs.join(" "),
+    knowsAbout: author.knowsAbout,
+    hasCredential: author.hasCredential,
     worksFor: {
       "@type": "Organization",
       name: "Relova",

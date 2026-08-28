@@ -23,6 +23,8 @@ export function BlogPostingJsonLd({ post, url }: Props) {
       "@type": "Person",
       name: author.name,
       url: absoluteUrl(author.path),
+      knowsAbout: author.knowsAbout,
+      hasCredential: author.hasCredential,
     },
     publisher: {
       "@type": "Organization",
