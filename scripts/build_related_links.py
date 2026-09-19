@@ -126,6 +126,84 @@ THEMES = {
     "retirement", "budget", "neighborhood", "citizenship", "passport",
     "checklist", "pets", "school", "salary", "freelancer", "property",
     "investment", "crypto",
+    # broad lifestyle/logistics clusters for posts with no country/city anchor
+    "career", "legal-docs", "wellbeing", "family-logistics", "travel-logistics",
+    "housing-logistics",
+}
+
+# slug-substring → theme, for topic clusters that don't carry a country/city
+# and were falling through to the weak token-overlap fallback (Pass 3).
+THEME_SLUG_MARKERS: dict[str, tuple[str, ...]] = {
+    "career": (
+        "accountant-finance-professional", "ai-tools-relocation-planning",
+        "data-scientist-ai-engineer", "designer-creative-working-abroad",
+        "lawyer-legal-professional-abroad", "marketing-professional-abroad",
+        "musician-artist-working-abroad", "nurse-practitioner-midwife",
+        "software-developer-working-abroad",
+        "teaching-abroad-retirement-second-career", "get-tech-job-abroad",
+        "get-job-abroad-without-work-visa", "remote-job-visa-sponsorship",
+        "freelancing-abroad-self-employed", "build-remote-work-career-abroad",
+        "location-independent-business-guide",
+        "negotiate-remote-work-before-moving-abroad",
+    ),
+    "legal-docs": (
+        "apostille-documents-guide", "power-of-attorney-abroad",
+        "inheritance-wills-expat-guide", "visa-cover-letter-guide",
+        "schengen-90-180-rule", "etias-explained",
+    ),
+    "housing-logistics": (
+        "find-long-term-accommodation-abroad",
+        "how-to-find-apartment-abroad-before-you-arrive",
+        "renting-apartment-foreigner-abroad", "negotiate-rent-abroad",
+        "house-sitting-abroad", "co-living-abroad", "buy-property-abroad-foreigner",
+        "expat-remote-real-estate-investment",
+    ),
+    "retire": (
+        "retire-abroad-complete-planning-guide",
+        "retire-abroad-social-security-guide", "retire-europe-2000-month",
+        "pension-abroad-expat-guide", "passive-income-residency-guide",
+        "permanent-residency-abroad-fastest-routes", "countries-pay-you-to-move",
+        "build-credit-abroad-expat",
+    ),
+    "wellbeing": (
+        "culture-shock-moving-abroad-guide", "homesickness-living-abroad-guide",
+        "expat-mental-health-guide", "expat-mental-health-support-guide",
+        "solo-female-expat-guide", "lgbt-expat-guide", "vegan-expat-guide",
+        "build-social-life-after-relocating-abroad",
+        "maintain-home-country-ties-living-abroad",
+    ),
+    "family-logistics": (
+        "best-cities-expat-families", "homeschooling-abroad-expat-guide",
+        "best-international-schools-expats", "moving-abroad-with-pets-guide",
+        "ivf-fertility-treatment-abroad", "expat-divorce-guide",
+        "having-baby-abroad-expat-guide",
+    ),
+    "travel-logistics": (
+        "shipping-belongings-abroad-guide", "international-driving-license-guide",
+        "buy-car-motorbike-abroad-expat", "relocation-scouting-trip-guide",
+        "emergency-abroad-expat-guide", "grocery-shopping-abroad-expat-guide",
+        "travel-hacking-expat-flights-guide", "van-life-europe-expat-guide",
+    ),
+    "niche-destination": (
+        "move-to-brisbane-guide", "move-to-kathmandu-guide",
+        "move-to-lagos-nigeria-guide", "move-to-pristina-guide",
+        "move-to-quito-ecuador-guide", "move-to-rwanda-guide",
+        "move-to-santiago-guide", "move-to-yerevan-guide",
+        "move-to-zurich-geneva-guide", "austria-red-white-red-card-guide",
+    ),
+    "roundup": (
+        "best-countries-remote-workers", "cheapest-countries-europe",
+        "cost-of-living-europe-cities", "best-islands-expats",
+        "countries-pay-you-to-move", "best-expat-communities-forums",
+        "working-holiday-visa-comparison", "dental-tourism-guide",
+        "build-credit-abroad-expat", "voting-abroad-expat-guide",
+        "best-countries-expats", "best-countries-freelancers",
+        "best-countries-engineers-abroad", "best-countries-low-taxes-expats",
+        "best-cities-digital-nomads-europe", "best-digital-nomad-destinations-beginners",
+        "best-remote-work-tools-expats", "best-vpn-expats",
+        "best-travel-credit-cards-expats", "best-travel-insurance-expats",
+        "visa-fees-comparison",
+    ),
 }
 
 
@@ -242,6 +320,10 @@ def extract_entities(slug: str, title: str, description: str) -> tuple[set, set,
     if "checklist" in slug or "timeline" in slug:
         themes.add("checklist")
 
+    for theme, markers in THEME_SLUG_MARKERS.items():
+        if any(m in slug for m in markers):
+            themes.add(theme)
+
     if "korea" in countries:
         countries.add("south-korea")
     if "bali" in cities or "bali" in slug_tokens:
@@ -309,14 +391,29 @@ def score_pair(a: Post, b: Post) -> tuple[int, list[str]]:
         reasons.append(f"related visa/pathway ({visa})")
     if shared_themes:
         theme_boost = 3 * min(2, len(shared_themes))
-        priority = shared_themes & {"banking", "tax", "taxes", "checklist", "healthcare", "insurance", "citizenship"}
+        priority = shared_themes & {
+            "banking", "tax", "taxes", "checklist", "healthcare", "insurance",
+            "citizenship", "career", "legal-docs", "housing-logistics",
+            "wellbeing", "family-logistics", "travel-logistics",
+            "retire", "retirement", "roundup", "niche-destination",
+        }
         if priority:
             theme_boost += 5
         if not shared_countries and not shared_cities and not shared_visas and not priority:
             theme_boost = min(theme_boost, 2)
         score += theme_boost
         theme = sorted(priority or shared_themes)[0]
-        reasons.append(f"overlapping theme ({theme})")
+        theme_label = {
+            "legal-docs": "legal & documents",
+            "housing-logistics": "housing & accommodation",
+            "family-logistics": "family life abroad",
+            "travel-logistics": "moving logistics",
+            "wellbeing": "expat wellbeing",
+            "career": "working abroad",
+            "roundup": "best-of comparison list",
+            "niche-destination": "another under-the-radar destination",
+        }.get(theme, theme)
+        reasons.append(f"overlapping theme ({theme_label})")
 
     stop = {
         "how", "to", "move", "guide", "2025", "2026", "the", "a", "an", "for",
