@@ -709,26 +709,50 @@ def add_inline_links(body: str, post: Post, related: list[tuple[Post, list[str],
 
 
 def collect_git_lastmod() -> dict[str, str]:
+    """Per-slug ISO date of the most recent commit that changed real article
+    content. Commits matching HOUSEKEEPING_COMMIT_RE (mechanical, site-wide
+    passes like the related-links rebuild) touch nearly every post at once
+    and are skipped in favor of each file's last genuine content commit, so
+    the displayed "Updated" date reflects real editorial changes rather than
+    a single script run that would otherwise collapse all 410 dates to one
+    identical timestamp — accurate but implausible-looking to readers and Google.
+    A file with no non-housekeeping history at all still falls back to its
+    newest housekeeping commit, so every slug keeps getting a real date.
+    """
     result = subprocess.run(
-        ["git", "log", "--pretty=format:%aI", "--name-only", "--", "content/posts/"],
+        ["git", "log", "--pretty=format:%x00%aI%x00%s", "--name-only", "--", "content/posts/"],
         cwd=ROOT,
         capture_output=True,
         text=True,
         check=True,
     )
     dates: dict[str, str] = {}
-    current: str | None = None
+    fallback_dates: dict[str, str] = {}
+    current_date: str | None = None
+    current_is_housekeeping = False
     for line in result.stdout.splitlines():
         line = line.strip()
         if not line:
             continue
-        if re.match(r"^\d{4}-\d{2}-\d{2}T", line):
-            current = line
-        elif line.startswith("content/posts/") and line.endswith(".mdx") and current:
+        if line.startswith("\x00"):
+            _, current_date, subject = line.split("\x00", 2)
+            current_is_housekeeping = bool(HOUSEKEEPING_COMMIT_RE.search(subject))
+            continue
+        if line.startswith("content/posts/") and line.endswith(".mdx") and current_date:
             slug = Path(line).stem
-            if slug not in dates:
-                dates[slug] = current
+            if slug not in fallback_dates:
+                fallback_dates[slug] = current_date
+            if not current_is_housekeeping and slug not in dates:
+                dates[slug] = current_date
+    for slug, date in fallback_dates.items():
+        dates.setdefault(slug, date)
     return dates
+
+
+HOUSEKEEPING_COMMIT_RE = re.compile(
+    r"rebuild related-guides links|strengthen related-links theme detection",
+    re.IGNORECASE,
+)
 
 
 def write_thin_report(posts: list[Post], main_site_status: str) -> Path:

@@ -12,14 +12,14 @@ Re-checked against live `content/posts/*.mdx`. All 12 still present and still ul
 
 | slug | words | path |
 | --- | ---: | --- |
-| `best-health-insurance-expats-europe-2025` | MISSING | `content/posts/best-health-insurance-expats-europe-2025.mdx` |
-| `best-countries-expats-2025-comparison` | MISSING | `content/posts/best-countries-expats-2025-comparison.mdx` |
-| `digital-nomad-visa-complete-guide-2025` | MISSING | `content/posts/digital-nomad-visa-complete-guide-2025.mdx` |
-| `visa-cover-letter-guide-2025` | MISSING | `content/posts/visa-cover-letter-guide-2025.mdx` |
 | `ultimate-relocation-checklist-2025` | MISSING | `content/posts/ultimate-relocation-checklist-2025.mdx` |
-| `cost-of-relocating-to-europe-2025` | MISSING | `content/posts/cost-of-relocating-to-europe-2025.mdx` |
 | `how-to-open-bank-account-abroad-2025` | MISSING | `content/posts/how-to-open-bank-account-abroad-2025.mdx` |
 | `portugal-vs-spain-vs-georgia-relocation-2025` | MISSING | `content/posts/portugal-vs-spain-vs-georgia-relocation-2025.mdx` |
+| `best-health-insurance-expats-europe-2025` | MISSING | `content/posts/best-health-insurance-expats-europe-2025.mdx` |
+| `best-countries-expats-2025-comparison` | MISSING | `content/posts/best-countries-expats-2025-comparison.mdx` |
+| `cost-of-relocating-to-europe-2025` | MISSING | `content/posts/cost-of-relocating-to-europe-2025.mdx` |
+| `visa-cover-letter-guide-2025` | MISSING | `content/posts/visa-cover-letter-guide-2025.mdx` |
+| `digital-nomad-visa-complete-guide-2025` | MISSING | `content/posts/digital-nomad-visa-complete-guide-2025.mdx` |
 | `how-to-find-apartment-abroad-before-you-arrive` | 713 | `content/posts/how-to-find-apartment-abroad-before-you-arrive.mdx` |
 | `build-social-life-after-relocating-abroad` | 716 | `content/posts/build-social-life-after-relocating-abroad.mdx` |
 | `relocate-with-family-abroad-guide` | 746 | `content/posts/relocate-with-family-abroad-guide.mdx` |
