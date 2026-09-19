@@ -84,7 +84,9 @@ export default function BlogIndexClient({ posts }: { posts: PostListItem[] }) {
             <li key={post.slug} className={hidden ? "hidden" : undefined}>
               <article className="group rounded-xl border border-border bg-card p-6 transition-colors hover:border-primary/30 sm:p-7">
                 <p className="text-[13px] font-medium tabular-nums text-muted-foreground">
-                  {formatDate(post.date)}
+                  {post.updatedAt.slice(0, 10) !== post.date.slice(0, 10)
+                    ? `Updated ${formatDate(post.updatedAt)}`
+                    : formatDate(post.date)}
                 </p>
                 <h2 className="mt-2 text-lg font-semibold leading-snug tracking-tight text-foreground sm:text-xl">
                   <Link
