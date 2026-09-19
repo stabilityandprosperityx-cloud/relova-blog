@@ -7,6 +7,7 @@ import { BlogPostingJsonLd } from "@/components/BlogPostingJsonLd";
 import { mdxComponents } from "@/components/mdx-components";
 import { getAuthorByName } from "@/lib/authors";
 import { getPostBySlug, getPostSlugs } from "@/lib/posts";
+import { lastmodIsoForPost } from "@/lib/post-lastmod";
 import { absoluteUrl } from "@/lib/site";
 import Link from "next/link";
 
@@ -24,6 +25,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const canonicalPath = `/blog/${post.slug}`;
   const pageUrl = absoluteUrl(canonicalPath);
   const ogImage = absoluteUrl(post.ogImage);
+  const modifiedTime = lastmodIsoForPost(post.slug, post.date);
 
   return {
     title: post.title,
@@ -37,6 +39,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       url: pageUrl,
       type: "article",
       publishedTime: post.date,
+      modifiedTime,
       authors: [post.author],
       images: [{ url: ogImage, alt: post.title }],
     },
@@ -64,6 +67,10 @@ export default async function BlogPostPage({ params }: Props) {
 
   const pageUrl = absoluteUrl(`/blog/${post.slug}`);
   const author = getAuthorByName(post.author);
+  const modifiedIso = lastmodIsoForPost(post.slug, post.date);
+  const publishedDay = post.date.slice(0, 10);
+  const modifiedDay = modifiedIso.slice(0, 10);
+  const showUpdated = modifiedDay !== publishedDay;
 
   return (
     <>
@@ -75,7 +82,10 @@ export default async function BlogPostPage({ params }: Props) {
               Blog
             </Link>
             <span className="mx-2 text-muted-foreground/40">/</span>
-            <span className="tabular-nums text-muted-foreground">{formatDate(post.date)}</span>
+            <span className="tabular-nums text-muted-foreground">
+              Published {formatDate(post.date)}
+              {showUpdated && <> · Updated {formatDate(modifiedIso)}</>}
+            </span>
           </p>
           <h1 className="mt-4 text-3xl font-semibold tracking-tight text-foreground sm:text-[2.25rem] sm:leading-[1.15]">
             {post.title}
