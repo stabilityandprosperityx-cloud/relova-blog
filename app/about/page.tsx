@@ -16,6 +16,15 @@ export const metadata: Metadata = {
       "Who writes the Relova Blog, how relocation guides are researched, and how to get in touch.",
     url: absoluteUrl("/about"),
     type: "website",
+    // openGraph merging with the root layout is shallow (replaces the whole
+    // object, doesn't merge keys), so images/siteName have to be restated
+    // here or this page silently loses the default og:image.
+    siteName: "Relova Blog",
+    images: [{ url: absoluteUrl("/images/blog-default.jpg"), width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: [absoluteUrl("/images/blog-default.jpg")],
   },
 };
 

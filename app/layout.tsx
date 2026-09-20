@@ -22,9 +22,16 @@ export const metadata: Metadata = {
     locale: "en_US",
     siteName: "Relova Blog",
     url: siteUrl,
+    // Site-wide fallback OG image — this file already existed in public/
+    // but was referenced nowhere, so any page without its own og image
+    // (root layout default, /blog, /about) had none at all in social
+    // share previews. Individual blog posts still set their own via
+    // post.ogImage in generateMetadata (app/blog/[slug]/page.tsx).
+    images: [{ url: `${siteUrl}/images/blog-default.jpg`, width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
+    images: [`${siteUrl}/images/blog-default.jpg`],
   },
 };
 

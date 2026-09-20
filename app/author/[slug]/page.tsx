@@ -26,6 +26,14 @@ export function generateMetadata({ params }: Props): Metadata {
       description,
       url: absoluteUrl(author.path),
       type: "profile",
+      // openGraph merging with the root layout is shallow (replaces the
+      // whole object), so images/siteName have to be restated here.
+      siteName: "Relova Blog",
+      images: [{ url: absoluteUrl("/images/blog-default.jpg"), width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      images: [absoluteUrl("/images/blog-default.jpg")],
     },
   };
 }
