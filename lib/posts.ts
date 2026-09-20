@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
 import { lastmodIsoForPost } from "./post-lastmod";
+import { detectCountry } from "./country";
 
 const postsDirectory = path.join(process.cwd(), "content/posts");
 
@@ -15,7 +16,7 @@ export type PostFrontmatter = {
   category?: string;
 };
 
-export type PostListItem = PostFrontmatter & { updatedAt: string };
+export type PostListItem = PostFrontmatter & { updatedAt: string; country: string | null };
 
 export type Post = PostFrontmatter & {
   content: string;
@@ -67,6 +68,7 @@ export function getAllPosts(): PostListItem[] {
             author: post.author,
             ogImage: post.ogImage,
             updatedAt: lastmodIsoForPost(post.slug, post.date),
+            country: detectCountry(post.slug),
             ...(post.category ? { category: post.category } : {}),
           }
         : null;
