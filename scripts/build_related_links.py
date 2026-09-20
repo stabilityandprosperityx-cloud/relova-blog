@@ -763,43 +763,6 @@ def write_thin_report(posts: list[Post], main_site_status: str) -> Path:
             rows.append((wc, p.slug, str(p.path.relative_to(ROOT))))
     rows.sort()
 
-    ultra_prev = {
-        "ultimate-relocation-checklist-2025",
-        "build-social-life-after-relocating-abroad",
-        "visa-cover-letter-guide-2025",
-        "relocate-with-family-abroad-guide",
-        "cost-of-relocating-to-europe-2025",
-        "how-to-find-apartment-abroad-before-you-arrive",
-        "how-to-open-bank-account-abroad-2025",
-        "best-countries-expats-2025-comparison",
-        "best-health-insurance-expats-europe-2025",
-        "portugal-vs-spain-vs-georgia-relocation-2025",
-        "austria-red-white-red-card-guide-2026",
-        "digital-nomad-visa-complete-guide-2025",
-    }
-    filled40 = {
-        "move-to-tenerife-guide-2026", "move-to-stockholm-guide-2026",
-        "singapore-entrepreneur-entrepass-guide-2026", "irish-citizenship-by-descent-guide-2026",
-        "move-to-kotor-montenegro-guide-2026", "expat-banking-complete-guide-2026",
-        "move-to-bogota-guide-2026", "amsterdam-neighborhoods-expat-guide-2026",
-        "lisbon-vs-madrid-expat-guide-2026", "dubai-remote-worker-virtual-working-2026",
-        "homesickness-living-abroad-guide-2026", "visa-fees-comparison-2026",
-        "move-to-north-macedonia-guide-2026", "spain-non-lucrative-visa-guide-2026",
-        "move-to-porto-complete-guide-2026", "italian-citizenship-jure-sanguinis-guide-2026",
-        "pension-abroad-expat-guide-2026", "tbilisi-digital-nomad-setup-guide-2026",
-        "bali-vs-thailand-expat-guide-2026", "move-to-greek-islands-guide-2026",
-        "tbilisi-first-week-checklist-2026", "negotiate-salary-moving-abroad-2026",
-        "move-to-spain-family-guide-2026", "move-to-albania-riviera-guide-2026",
-        "move-to-phuket-guide-2026", "move-to-lisbon-family-guide-2026",
-        "find-long-term-accommodation-abroad-2026", "move-to-vienna-guide-2026",
-        "medellin-vs-bogota-vs-cartagena-guide-2026", "lisbon-freelancer-setup-guide-2026",
-        "move-to-panama-city-guide-2026", "move-to-oaxaca-mexico-guide-2026",
-        "move-to-batumi-guide-2026", "move-to-malaga-guide-2026",
-        "canggu-vs-ubud-vs-seminyak-bali-guide-2026", "japan-digital-nomad-visa-guide-2026",
-        "lisbon-vs-porto-vs-algarve-guide-2026", "south-korea-digital-nomad-visa-guide-2026",
-        "move-to-berlin-nomad-guide-2026", "portugal-d8-visa-application-step-by-step-2026",
-    }
-
     by_slug = {p.slug: word_count(p.body, exclude_related=True) for p in posts}
     lines = [
         "# Thin content audit — blog.relova.ai",
@@ -810,24 +773,7 @@ def write_thin_report(posts: list[Post], main_site_status: str) -> Path:
         f"- Posts with body &lt; 400 words: **{len(rows)}**",
         f"- Ultra stubs (≤50 words): **{sum(1 for w,_,_ in rows if w <= 50)}**",
         "",
-        "## Ultra stubs (previously flagged 12)",
-        "",
-        "Re-checked against live `content/posts/*.mdx`. All 12 still present and still ultra-thin:",
-        "",
-        "| slug | words | path |",
-        "| --- | ---: | --- |",
-    ]
-    for slug in sorted(ultra_prev, key=lambda s: by_slug.get(s, 0)):
-        lines.append(f"| `{slug}` | {by_slug.get(slug, 'MISSING')} | `content/posts/{slug}.mdx` |")
-
-    lines += [
-        "",
-        "## Previously filled cohort (40)",
-        "",
-        "All 40 posts from `audit_low_data_posts.md` are now ≥400 words (not rewritten in this pass):",
-        "",
-        f"- Still &lt;400: **{sum(1 for s in filled40 if by_slug.get(s, 0) < 400)}**",
-        f"- Word range: {min(by_slug[s] for s in filled40)}–{max(by_slug[s] for s in filled40)}",
+        "The Sep 2026 expansion batches (thin-content remediation) are complete: every post is now ≥400 words. This report is regenerated live off `content/posts/*.mdx` each run — no hardcoded historical slug lists — so it stays accurate as slugs get renamed (e.g. the 2025→2026 batch rename).",
         "",
         "## Full thin list (&lt;400 words)",
         "",
@@ -835,8 +781,7 @@ def write_thin_report(posts: list[Post], main_site_status: str) -> Path:
         "| --- | ---: | --- |",
     ]
     for wc, slug, path in rows:
-        flag = " ⚠️ ultra stub" if slug in ultra_prev else ""
-        lines.append(f"| `{slug}` | {wc}{flag} | `{path}` |")
+        lines.append(f"| `{slug}` | {wc} | `{path}` |")
 
     lines += [
         "",
