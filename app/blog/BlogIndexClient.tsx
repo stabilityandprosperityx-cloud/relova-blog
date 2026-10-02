@@ -59,19 +59,13 @@ export default function BlogIndexClient({ posts }: { posts: PostListItem[] }) {
   });
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-14 sm:px-6 sm:py-20">
-      <header className="mb-10 sm:mb-12">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-primary">
-          Relova
-        </p>
-        <h1 className="mt-3 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl sm:leading-tight">
-          Relocation insights
-        </h1>
-        <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-          Visas, destinations, and checklists for people building a life abroad - backed by
-          Relova&apos;s relocation tools.
-        </p>
+    <main className="relova-journal-page">
+      <header className="relova-journal-hero">
+        <img src="/images/blog-hero-relova.jpg" alt="Relova journal reading lounge overlooking Florence" />
+        <div><p>THE RELOVA JOURNAL</p><h1>Ideas for a life<br/><em>without borders.</em></h1><span>Practical guidance on visas, destinations and the decisions behind a confident move.</span></div>
       </header>
+      <div className="relova-journal-content">
+      <div className="relova-journal-intro"><div><p>EXPLORE THE JOURNAL</p><h2>Research your next chapter.</h2></div><span>{posts.length} considered guides, built to turn complex relocation questions into clear next steps.</span></div>
 
       <div className="mb-6 flex flex-col gap-3 sm:flex-row">
         <div className="relative flex-1">
@@ -156,10 +150,10 @@ export default function BlogIndexClient({ posts }: { posts: PostListItem[] }) {
         </p>
       )}
 
-      <ul className="space-y-5">
+      <ul className="relova-journal-grid">
         {visiblePosts.map((post) => (
           <li key={post.slug}>
-            <article className="group rounded-xl border border-border bg-card p-6 transition-colors hover:border-primary/30 sm:p-7">
+            <article className="group relova-journal-card">
               <p className="text-[13px] font-medium tabular-nums text-muted-foreground">
                 {post.updatedAt.slice(0, 10) !== post.date.slice(0, 10)
                   ? `Updated ${formatDate(post.updatedAt)}`
@@ -187,6 +181,7 @@ export default function BlogIndexClient({ posts }: { posts: PostListItem[] }) {
           </li>
         ))}
       </ul>
-    </div>
+      </div>
+    </main>
   );
 }
