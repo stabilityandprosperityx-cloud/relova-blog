@@ -59,7 +59,7 @@ export default function BlogIndexClient({ posts }: { posts: PostListItem[] }) {
   });
 
   return (
-    <main className="relova-journal-page">
+    <div className="relova-journal-page">
       <header className="relova-journal-hero">
         <img src="/images/blog-hero-relova.jpg" alt="Relova journal reading lounge overlooking Florence" />
         <div><p>THE RELOVA JOURNAL</p><h1>Ideas for a life<br/><em>without borders.</em></h1><span>Practical guidance on visas, destinations and the decisions behind a confident move.</span></div>
@@ -182,6 +182,6 @@ export default function BlogIndexClient({ posts }: { posts: PostListItem[] }) {
         ))}
       </ul>
       </div>
-    </main>
+    </div>
   );
 }
